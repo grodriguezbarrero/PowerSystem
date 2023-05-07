@@ -144,7 +144,7 @@ for igenscenario = ngenscenarios:-1:1
         fun_setsimulinkblockparameters(powersystemdl(1:end-4),ngen,m_gendata,ness,m_essdata, ...
             v_genscenario,v_igenonline,igenonline,v_iremgenonline,v_pshed0MW);
         
-        % for the first generator down in each scenario
+        % for the FIRST GENERATOR DOWN in each scenario
         if igenonline == 1
             for nWGonline = 0:3
                 % set the right number of WGs
@@ -196,7 +196,7 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
             plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(j_simulation));hold on;
             isim = isim - 1;
             % add new label to the legend. +10 is added because the
-            % Generator number labels start at 11.
+            % generator number labels start at 11.
             v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
         end
     end
@@ -211,7 +211,7 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
 
     % sim_in_scenario_wg = 0;
     
-    for sim_in_scenario_wg = 1:4
+    for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
         plot(ha2,c_t_wg{isim_wg},c_w_wg{isim_wg}*fbase,'Color',v_colours(isim_wg));hold on;
         isim_wg = isim_wg - 1;
     end
