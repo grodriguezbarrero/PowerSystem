@@ -15,29 +15,20 @@ load_system(powersystemdl);
 
 %% Setting up parameters
 
-% tsimulation = 50;
-% X0 = [0.5161 0.5161 1.1861];
-% xInitial = X0;
-
 % if we set vw = 10
 % pinitwindgen = 0.5161;
 % wr0          = 1.1861;
 
 % startup wind speed
-% vw = 10; % CHANGE THIS
-[~,~,~,~,pinitwindgen,wr0] = fun_getwindpowercurve_v4(0,vw);
-pinitwindgen = pinitwindgen(1);
-wr0 = wr0(1);
-
 Tc1 = 0.05;
 Tc2 = 0.05;
 Hw  = 5;    % inertia
 R   = 0.05; % droop
 
-%% Setting up the LUTs
+%% Setting up the LUTs and the initial equilibrium point
 v_vw    = 5:.5:12;
-len_v_wr = 401;
-[m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel] = fun_getwindpowercurve_v4(0,v_vw);
+
+[m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel,pinitwindgen,wr0] = fun_getwindpowercurve_v5(0,v_vw,vw);
 
 %% Set predefined WG parameters on Simulink model
 set_param([powersystemdl '/WindGenerator'],'Hw',sprintf('%f',Hw),'Tc1',sprintf('%f',Tc1),'Tc2',sprintf('%f',Tc2),'R',sprintf('%f',R), 'pinitwindgen', ...
