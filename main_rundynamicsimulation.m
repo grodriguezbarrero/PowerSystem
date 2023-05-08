@@ -236,11 +236,6 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
             % generator number labels start at 11.
             v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
             
-%             title(['Scenario ', num2str(i_scenario)]);
-%             legend(v_legend);
-%             xlabel(ha1,'Time (s)')
-%             ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
-%             hold off;
         end
     end
     title(['Scenario ', num2str(i_scenario)]);
