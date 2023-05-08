@@ -180,6 +180,45 @@ isim = nsimulations;
 
 isim_wg = nsimulations_wg;
 
+% for i_scenario = 1:num_scenarios            % iterate through each scenario
+%     
+%     hf1 = figure;axes
+%     ha1 = hf1.CurrentAxes;
+% 
+%     sim_in_scenario = 0;
+% 
+%     for j_simulation = 1:num_gen_in_total   % iterate through every generator
+%         
+%         if m_genscenarios(i_scenario, j_simulation) ~= 0
+%             sim_in_scenario = sim_in_scenario + 1;
+%             plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(j_simulation));hold on;
+%             isim = isim - 1;
+%             % add new label to the legend. +10 is added because the
+%             % generator number labels start at 11.
+%             v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
+%             
+% %             title(['Scenario ', num2str(i_scenario)]);
+% %             legend(v_legend);
+% %             xlabel(ha1,'Time (s)')
+% %             ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
+% %             hold off;
+% 
+%             hf2 = figure;axes
+%             ha2 = hf2.CurrentAxes;
+%             for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
+%                 plot(ha2,c_t_wg{isim_wg},c_w_wg{isim_wg}*fbase,'Color',v_colours(sim_in_scenario_wg));hold on;
+%                 isim_wg = isim_wg - 1;
+%             end
+%             title(['Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+%             legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+%             xlabel(ha2,'Time (s)')
+%             ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
+%             hold off;
+%         end
+%     end
+% end
+
+
 for i_scenario = 1:num_scenarios            % iterate through each scenario
     
     hf1 = figure;axes
@@ -188,7 +227,7 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
     sim_in_scenario = 0;
 
     for j_simulation = 1:num_gen_in_total   % iterate through every generator
-
+        
         if m_genscenarios(i_scenario, j_simulation) ~= 0
             sim_in_scenario = sim_in_scenario + 1;
             plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(j_simulation));hold on;
@@ -197,7 +236,27 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
             % generator number labels start at 11.
             v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
             
-            
+%             title(['Scenario ', num2str(i_scenario)]);
+%             legend(v_legend);
+%             xlabel(ha1,'Time (s)')
+%             ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
+%             hold off;
+        end
+    end
+    title(['Scenario ', num2str(i_scenario)]);
+    legend(v_legend);
+    xlabel(ha1,'Time (s)')
+    ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
+    hold off;
+end
+
+
+for i_scenario = 1:num_scenarios            % iterate through each scenario
+    for j_simulation = 1:num_gen_in_total   % iterate through every generator
+        
+        if m_genscenarios(i_scenario, j_simulation) ~= 0
+            % add new label to the legend. +10 is added because the
+            % generator number labels start at 11.
 
             hf2 = figure;axes
             ha2 = hf2.CurrentAxes;
@@ -210,17 +269,9 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
             xlabel(ha2,'Time (s)')
             ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
             hold off;
-
-
         end
     end
-    
-    
-    title(['Scenario ', num2str(i_scenario)]);
-    legend(v_legend);
-    xlabel(ha1,'Time (s)')
-    ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
-    hold off;
+end
 
 %     hf2 = figure;axes
 %     ha2 = hf2.CurrentAxes;
@@ -237,8 +288,6 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
 %     ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
 %     hold off;
 
-
-end
 
 %{
 
