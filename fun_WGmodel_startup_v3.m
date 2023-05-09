@@ -22,7 +22,7 @@ load_system(powersystemdl);
 % startup wind speed
 Tc1 = 0.05;
 Tc2 = 0.05;
-Hw  = 5;    % inertia
+Hw  = 5;    % inertia, in its own base
 R   = 0.05; % droop
 
 %% Setting up the LUTs and the initial equilibrium point

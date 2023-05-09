@@ -13,7 +13,7 @@ str_uftype = 'uf';
 str_rocoftype = 'rocof';
 
 fbase = 50;
-tsimulation = 15;
+tsimulation = 20;
 t0 = 1;
 
 v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
