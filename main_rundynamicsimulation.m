@@ -19,8 +19,10 @@ t0 = 1;
 v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
 
 % initialise WG model
-vw = 10;
-[pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw);
+vw_ini        = 10;
+t_wind_change = 5;
+vw_after      = 10;
+[pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
 
 
 % -------------------------------------------------------------------------
@@ -50,7 +52,7 @@ end
 
 % read ufls parameters
 [m_uflsparam,c_uflsID] = xlsread(xlsfilename,c_sheets{4}); 
-[m_ufparam, m_rocofparam, v_pshed0] = ...
+[m_ufparam , m_rocofparam, v_pshed0] = ...
     fun_prepareuflsformat4simulinkformat(m_uflsparam, c_uflsID, str_uftype, str_rocoftype);
 
 v_dfufpu = (m_ufparam(:,1)-fbase)/fbase;
@@ -109,7 +111,8 @@ set_param([powersystemdl(1:end-4) '/Perturbation'],'time',['[' sprintf('%f',t0) 
 
 set_param(powersystemdl(1:end-4),'StopTime',sprintf('%f',tsimulation));
 
-set_param([powersystemdl(1:end-4) '/Wind'],'After',['[' sprintf('%f',vw-3) ']'],'Before',['[' sprintf('%f',vw) ']']);
+set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_wind_change) ']'], 'After',['[' sprintf('%f',vw_after) ']'], ...
+    'Before',['[' sprintf('%f',vw_ini) ']']);
 
 set_param([powersystemdl(1:end-4) '/WindGenerator'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
 set_param([powersystemdl(1:end-4) '/WindGenerator1'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
@@ -142,8 +145,7 @@ for igenscenario = ngenscenarios:-1:1
         fun_setsimulinkblockparameters(powersystemdl(1:end-4),ngen,m_gendata,ness,m_essdata, ...
             v_genscenario,v_igenonline,igenonline,v_iremgenonline,v_pshed0MW);
         
-        % for the FIRST GENERATOR DOWN in each scenario
-        %if igenonline == 1
+        %if igenonline == 1 % for the FIRST GENERATOR DOWN in each scenario
             for nWGonline = 0:3
                 % set the right number of WGs
                 set_param([powersystemdl(1:end-4) '/numWG'],'Value',['[' sprintf('%f',4-nWGonline) ':4]']);
@@ -179,45 +181,6 @@ num_gen_in_total        = length(m_genscenarios(1,:));
 isim = nsimulations;
 
 isim_wg = nsimulations_wg;
-
-% for i_scenario = 1:num_scenarios            % iterate through each scenario
-%     
-%     hf1 = figure;axes
-%     ha1 = hf1.CurrentAxes;
-% 
-%     sim_in_scenario = 0;
-% 
-%     for j_simulation = 1:num_gen_in_total   % iterate through every generator
-%         
-%         if m_genscenarios(i_scenario, j_simulation) ~= 0
-%             sim_in_scenario = sim_in_scenario + 1;
-%             plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(j_simulation));hold on;
-%             isim = isim - 1;
-%             % add new label to the legend. +10 is added because the
-%             % generator number labels start at 11.
-%             v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
-%             
-% %             title(['Scenario ', num2str(i_scenario)]);
-% %             legend(v_legend);
-% %             xlabel(ha1,'Time (s)')
-% %             ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
-% %             hold off;
-% 
-%             hf2 = figure;axes
-%             ha2 = hf2.CurrentAxes;
-%             for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
-%                 plot(ha2,c_t_wg{isim_wg},c_w_wg{isim_wg}*fbase,'Color',v_colours(sim_in_scenario_wg));hold on;
-%                 isim_wg = isim_wg - 1;
-%             end
-%             title(['Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-%             legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
-%             xlabel(ha2,'Time (s)')
-%             ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
-%             hold off;
-%         end
-%     end
-% end
-
 
 for i_scenario = 1:num_scenarios            % iterate through each scenario
     
@@ -267,37 +230,3 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
         end
     end
 end
-
-%     hf2 = figure;axes
-%     ha2 = hf2.CurrentAxes;
-%     sim_in_scenario_wg = 0;
-    
-%     for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
-%         plot(ha2,c_t_wg{isim_wg},c_w_wg{isim_wg}*fbase,'Color',v_colours(isim_wg));hold on;
-%         isim_wg = isim_wg - 1;
-%     end
-    
-%     title(['Scenario ', num2str(i_scenario), ' with first generator shut off']);
-%     legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
-%     xlabel(ha1,'Time (s)')
-%     ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
-%     hold off;
-
-
-%{
-
-hf1 = figure;axes
-ha1 = hf1.CurrentAxes;
-for isim = nsimulations:-1:1
-    plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(isim));hold on;
-
-    v_legend(isim) = strcat("Simulation ", num2str(isim));
-    % legend(strcat("Simulation ", num2str(isim)));
-end
-
-legend(v_legend);
-xlabel(ha1,'Time (s)')
-ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
-hold off;
-
-%}
