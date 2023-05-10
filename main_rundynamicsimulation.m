@@ -208,7 +208,6 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
     hold off;
 end
 
-
 for i_scenario = 1:num_scenarios            % iterate through each scenario
     for j_simulation = 1:num_gen_in_total   % iterate through every generator
         
