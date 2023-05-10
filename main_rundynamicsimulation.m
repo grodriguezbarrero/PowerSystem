@@ -19,9 +19,9 @@ t0 = 1;
 v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
 
 % initialise WG model
-vw_ini        = 10;
+vw_ini        = 6;
 t_wind_change = 5;
-vw_after      = 10;
+vw_after      = 6;
 [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
 
 
@@ -88,6 +88,7 @@ c_t = cell(nsimulations,1);
 c_w = cell(nsimulations,1);
 c_pgentot = cell(nsimulations,1);
 c_pufls = cell(nsimulations,1);
+c_WGpenetration = cell(nsimulations,1);
 isim = nsimulations;
 
 % preallocate output cells, but for the simulations where different WGs are
@@ -97,6 +98,7 @@ c_t_wg = cell(nsimulations_wg,1);
 c_w_wg = cell(nsimulations_wg,1);
 c_pgentot_wg = cell(nsimulations_wg,1);
 c_pufls_wg = cell(nsimulations_wg,1);
+c_WGpenetration_wg = cell(nsimulations_wg,1);
 isim_wg = nsimulations_wg;
 
 ngenscenarios = size(m_genscenarios,1);
@@ -150,14 +152,14 @@ for igenscenario = ngenscenarios:-1:1
                 % set the right number of WGs
                 set_param([powersystemdl(1:end-4) '/numWG'],'Value',['[' sprintf('%f',4-nWGonline) ':4]']);
                 % simulate it and store results
-                [c_t_wg{isim_wg},~,c_w_wg{isim_wg},c_pgentot_wg{isim_wg},c_pufls_wg{isim_wg}] = sim(powersystemdl);
+                [c_t_wg{isim_wg},~,c_w_wg{isim_wg},c_pgentot_wg{isim_wg},c_pufls_wg{isim_wg}, c_WGpenetration_wg{isim_wg}] = sim(powersystemdl);
                 isim_wg = isim_wg - 1;
             end
         %end
         
         set_param([powersystemdl(1:end-4) '/numWG'],'Value','4');
 
-        [c_t{isim},~,c_w{isim},c_pgentot{isim},c_pufls{isim}] = sim(powersystemdl); % ~ means that the output is not used
+        [c_t{isim},~,c_w{isim},c_pgentot{isim},c_pufls{isim},c_WGpenetration{isim}] = sim(powersystemdl); % ~ means that the output is not used
         isim = isim-1;
 
     end
@@ -229,3 +231,21 @@ for i_scenario = 1:num_scenarios            % iterate through each scenario
         end
     end
 end
+
+hf3 = figure;axes
+ha3 = hf3.CurrentAxes;
+
+isim_wg = 4;
+plot(ha3,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
+isim_wg = isim_wg - 1;
+plot(ha3,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
+isim_wg = isim_wg - 1;
+plot(ha3,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
+isim_wg = isim_wg - 1;
+plot(ha3,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
+
+title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+xlabel(ha2,'Time (s)')
+ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
+hold off;
