@@ -12,12 +12,22 @@ v_pinit = v_genscenario(v_iremgenonline);
 v_Mbase = m_gendata(4,v_iremgenonline);
 Sbase = sum(v_Mbase);
 
+% ----
+% calculate the total generated power
+pgenCGtot = 0;
+for i=1:ngen % iterate through every remaining generator
+    pgenCGtot = pgenCGtot + v_genscenario(v_iremgenonline(i));  % sum the power of the remaining generator in question
+end
+pgenCGtot = pgenCGtot/Sbase;
+% ----
+
 % lost amount of power
 plostpu = v_genscenario(v_igenonline(igenonline))/Sbase;
 
 % get dynamic parameters of remaining units
 v_h = m_gendata(3,v_iremgenonline); % pu on generator rating basis
 heq = v_h*v_Mbase(:)/Sbase;
+close all
 
 v_kpugenrating = m_gendata(2,v_iremgenonline); % pu on generator rating basis
 v_kgpu = v_kpugenrating.*v_Mbase/Sbase;
@@ -75,6 +85,10 @@ set_param([powersystemdl '/Perturbation'],'After',['[' sprintf('%f',plostpu) ']'
 % WG-RELATED PARAMETERS
 % set system base change parameters (System base only, where the system base is the sum of the Mbase's of the CG)
 set_param([powersystemdl '/SystemBaseChange'],'Gain',['[1.5/' sprintf('%f',Sbase) ']']);
+
+% set total generated power by the CG (the actual one; not the change in
+% power generation)
+set_param([powersystemdl '/pgenCGtot'],'Value',['[' sprintf('%f ',pgenCGtot) ']']);
 
 % % set WG parameters
 % set_param([powersystemdl '/WindGenerator'],'Hw',sprintf('%f',Hw),'Tc1',sprintf('%f',Tc1),'Tc2',sprintf('%f',Tc2),'R',sprintf('%f',R), 'pinitwindgen', ...
