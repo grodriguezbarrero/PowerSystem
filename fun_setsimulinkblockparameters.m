@@ -86,6 +86,9 @@ set_param([powersystemdl '/Perturbation'],'After',['[' sprintf('%f',plostpu) ']'
 % set system base change parameters (System base only, where the system base is the sum of the Mbase's of the CG)
 set_param([powersystemdl '/SystemBaseChange'],'Gain',['[1.5/' sprintf('%f',Sbase) ']']);
 
+% set system base change parameters (System base only, where the system base is the sum of the Mbase's of the CG)
+set_param([powersystemdl '/SystemBaseChange1'],'Gain',['[1.5/' sprintf('%f',Sbase) ']']);
+
 % set total generated power by the CG (the actual one; not the change in
 % power generation)
 set_param([powersystemdl '/pgenCGtot'],'Value',['[' sprintf('%f ',pgenCGtot) ']']);

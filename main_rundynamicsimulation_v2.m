@@ -1,4 +1,6 @@
-    function main_rundynamicsimulation
+    function main_rundynamicsimulation_v2
+
+    % This version aims to provide fewer graphs but more quickly.
     
     % -------------------------------------------------------------------------
     % Predefined values
@@ -13,14 +15,14 @@
     str_rocoftype = 'rocof';
     
     fbase = 50;
-    tsimulation = 20;
+    tsimulation = 40;
     t0 = 1;
     
     v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
     
     % initialise WG model
     vw_ini        = 6;
-    t_wind_change = 5;
+    t_wind_change = 20;
     vw_after      = 6;
     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
     
@@ -79,16 +81,16 @@
     
     disp('Simulation start...');
     
-    nscenarios = 2;
+    nscenarios = 1;
     m_genscenarios = m_genscenarios(1:nscenarios,:); % REMOVE THIS TO GET ALL SCENARIOS
     
     % preallocate output cells
     nsimulations = length(nonzeros(m_genscenarios));
-    c_t                 = cell(nsimulations,1);
-    c_w                 = cell(nsimulations,1);
-    c_pgentot           = cell(nsimulations,1);
-    c_pufls             = cell(nsimulations,1);
-    c_pgenWGtot         = cell(nsimulations,1);
+%     c_t                 = cell(nsimulations,1);
+%     c_w                 = cell(nsimulations,1);
+%     c_pgentot           = cell(nsimulations,1);
+%     c_pufls             = cell(nsimulations,1);
+%     c_pgenWGtot         = cell(nsimulations,1);
     isim = nsimulations;
     
     % preallocate output cells, but for the simulations where different WGs are
@@ -153,15 +155,15 @@
                     % set the right number of WGs
                     set_param([powersystemdl(1:end-4) '/numWG'],'Value',['[' sprintf('%f',4-nWGonline) ':4]']);
                     % simulate it and store results
-                    [c_t_wg{isim_wg},~,c_w_wg{isim_wg},c_pgentot_wg{isim_wg},c_pufls_wg{isim_wg}, c_pgenWGtot_wg{isim_wg}, c_WGpenetration_wg{isim}] = sim(powersystemdl);
+                    [c_t_wg{isim_wg},~,c_w_wg{isim_wg},c_pgentot_wg{isim_wg},c_pufls_wg{isim_wg}, c_pgenWGtot_wg{isim_wg},c_WGpenetration_wg{isim_wg}] = sim(powersystemdl);
                     isim_wg = isim_wg - 1;
                 end
             %end
             
-            set_param([powersystemdl(1:end-4) '/numWG'],'Value','4');
+%             set_param([powersystemdl(1:end-4) '/numWG'],'Value','4');
     
-            [c_t{isim},~,c_w{isim},c_pgentot{isim},c_pufls{isim}, c_pgenWGtot{isim},~] = sim(powersystemdl); % ~ means that the output is not used
-            isim = isim-1;
+%             [c_t{isim},~,c_w{isim},c_pgentot{isim},c_pufls{isim}, c_pgenWGtot{isim},~] = sim(powersystemdl); % ~ means that the output is not used
+%             isim = isim-1;
     
         end
         
@@ -185,31 +187,31 @@
     
     isim_wg = nsimulations_wg;
     
-    for i_scenario = 1:num_scenarios            % iterate through each scenario
-        
-        hf1 = figure;axes
-        ha1 = hf1.CurrentAxes;
-    
-        sim_in_scenario = 0;
-    
-        for j_simulation = 1:num_gen_in_total   % iterate through every generator
-            
-            if m_genscenarios(i_scenario, j_simulation) ~= 0
-                sim_in_scenario = sim_in_scenario + 1;
-                plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(j_simulation));hold on;
-                isim = isim - 1;
-                % add new label to the legend. +10 is added because the
-                % generator number labels start at 11.
-                v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
-                
-            end
-        end
-        title(['Scenario ', num2str(i_scenario)]);
-        legend(v_legend);
-        xlabel(ha1,'Time (s)')
-        ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
-        hold off;
-    end
+%     for i_scenario = 1:num_scenarios            % iterate through each scenario
+%         
+%         hf1 = figure;axes
+%         ha1 = hf1.CurrentAxes;
+%     
+%         sim_in_scenario = 0;
+%     
+%         for j_simulation = 1:num_gen_in_total   % iterate through every generator
+%             
+%             if m_genscenarios(i_scenario, j_simulation) ~= 0
+%                 sim_in_scenario = sim_in_scenario + 1;
+%                 plot(ha1,c_t{isim},c_w{isim}*fbase,'Color',v_colours(j_simulation));hold on;
+%                 isim = isim - 1;
+%                 % add new label to the legend. +10 is added because the
+%                 % generator number labels start at 11.
+%                 v_legend(sim_in_scenario) = strcat("Bus ", num2str(j_simulation+10)); % shows the disconnected generator
+%                 
+%             end
+%         end
+%         title(['Scenario ', num2str(i_scenario)]);
+%         legend(v_legend);
+%         xlabel(ha1,'Time (s)')
+%         ylabel(ha1,'Frequency deviation \Delta\omega (Hz)')
+%         hold off;
+%     end
     
     for i_scenario = 1:num_scenarios            % iterate through each scenario
         for j_simulation = 1:num_gen_in_total   % iterate through every generator
@@ -235,39 +237,57 @@
     
     % TO BE CHANGED:
     
+% 
+%     hf3 = figure;axes
+%     ha3 = hf3.CurrentAxes;
+%     
+%     isim_wg = 4;
+%     plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(1));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(2));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(3));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(4));hold on;
+%     
+%     title(['Power shedded by UFLS ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+%     legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+%     xlabel(ha2,'Time (s)')
+%     ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
+%     hold off;
 
-    hf3 = figure;axes
-    ha3 = hf3.CurrentAxes;
+    hf4 = figure;axes
+    ha4 = hf4.CurrentAxes;
     
     isim_wg = 4;
-    plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(1));hold on;
+    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(1));hold on;
     isim_wg = isim_wg - 1;
-    plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(2));hold on;
+    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(2));hold on;
     isim_wg = isim_wg - 1;
-    plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(3));hold on;
+    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(3));hold on;
     isim_wg = isim_wg - 1;
-    plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(4));hold on;
+    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(4));hold on;
     
-    title(['Power shedded by UFLS ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+    title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
     legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
     xlabel(ha2,'Time (s)')
     ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
     hold off;
 
-%     hf4 = figure;axes
-%     ha4 = hf4.CurrentAxes;
-%     
-%     isim_wg = 4;
-%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(1));hold on;
-%     isim_wg = isim_wg - 1;
-%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(2));hold on;
-%     isim_wg = isim_wg - 1;
-%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(3));hold on;
-%     isim_wg = isim_wg - 1;
-%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(4));hold on;
-%     
-%     title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-%     legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
-%     xlabel(ha2,'Time (s)')
-%     ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
-%     hold off;
+    hf5 = figure;axes
+    ha5 = hf5.CurrentAxes;
+    
+    isim_wg = 4;
+    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(1));hold on;
+    isim_wg = isim_wg - 1;
+    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(2));hold on;
+    isim_wg = isim_wg - 1;
+    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(3));hold on;
+    isim_wg = isim_wg - 1;
+    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(4));hold on;
+    
+    title(['WG generation in scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+    legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+    xlabel(ha2,'Time (s)')
+    ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
+    hold off;
