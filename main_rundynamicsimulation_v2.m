@@ -231,13 +231,31 @@
                 xlabel(ha2,'Time (s)')
                 ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
                 hold off;
+                
+                isim_wg = isim_wg + 4;
+
+                hf3 = figure;axes
+                ha3 = hf3.CurrentAxes;
+                for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
+                    plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg}*fbase,'Color',v_colours(sim_in_scenario_wg));hold on;
+                    isim_wg = isim_wg - 1;
+                end
+                title(['Power shedded by UFLS in Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+                legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+                xlabel(ha2,'Time (s)')
+                ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
+                hold off;
+                
             end
         end
     end
     
+    
+
+    
     % TO BE CHANGED:
     
-% 
+
 %     hf3 = figure;axes
 %     ha3 = hf3.CurrentAxes;
 %     
@@ -255,39 +273,39 @@
 %     xlabel(ha2,'Time (s)')
 %     ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
 %     hold off;
-
-    hf4 = figure;axes
-    ha4 = hf4.CurrentAxes;
-    
-    isim_wg = 4;
-    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(1));hold on;
-    isim_wg = isim_wg - 1;
-    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(2));hold on;
-    isim_wg = isim_wg - 1;
-    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(3));hold on;
-    isim_wg = isim_wg - 1;
-    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(4));hold on;
-    
-    title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-    legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
-    xlabel(ha2,'Time (s)')
-    ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
-    hold off;
-
-    hf5 = figure;axes
-    ha5 = hf5.CurrentAxes;
-    
-    isim_wg = 4;
-    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(1));hold on;
-    isim_wg = isim_wg - 1;
-    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(2));hold on;
-    isim_wg = isim_wg - 1;
-    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(3));hold on;
-    isim_wg = isim_wg - 1;
-    plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(4));hold on;
-    
-    title(['WG generation in scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-    legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
-    xlabel(ha2,'Time (s)')
-    ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
-    hold off;
+% 
+%     hf4 = figure;axes
+%     ha4 = hf4.CurrentAxes;
+%     
+%     isim_wg = 4;
+%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(1));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(2));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(3));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(4));hold on;
+%     
+%     title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+%     legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+%     xlabel(ha4,'Time (s)')
+%     ylabel(ha4,'WG penetration (%)')
+%     hold off;
+% 
+%     hf5 = figure;axes
+%     ha5 = hf5.CurrentAxes;
+%     
+%     isim_wg = 4;
+%     plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(1));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(2));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(3));hold on;
+%     isim_wg = isim_wg - 1;
+%     plot(ha5,c_t_wg{isim_wg},c_pgenWGtot_wg{isim_wg},'Color',v_colours(4));hold on;
+%     
+%     title(['WG generation in scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+%     legend('Zero WG', 'One WG', 'Two WGs', 'Three WGs');
+%     xlabel(ha2,'Time (s)')
+%     ylabel(ha2,'Total generated WG power')
+%     hold off;
