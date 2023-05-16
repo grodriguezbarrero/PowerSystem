@@ -13,7 +13,7 @@ v_Mbase = m_gendata(4,v_iremgenonline);
 Sbase = sum(v_Mbase);
 
 % ----
-% calculate the total generated power
+% calculate the total generated power by CG
 pgenCGtot = 0;
 for i=1:ngen % iterate through every remaining generator
     pgenCGtot = pgenCGtot + v_genscenario(v_iremgenonline(i));  % sum the power of the remaining generator in question
