@@ -123,9 +123,6 @@
     for i = 0:numWG-1
         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
     end
-%     set_param([powersystemdl(1:end-4) '/WindGenerator'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
-%     set_param([powersystemdl(1:end-4) '/WindGenerator1'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
-%     set_param([powersystemdl(1:end-4) '/WindGenerator2'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
 
     % simulate each scenario
     for igenscenario = ngenscenarios:-1:1

@@ -94,8 +94,8 @@ v_wrdel = v_Wrdel/Wrn; % speed corresponding to deloaded operation points
 wr0     = Wr0/Wrn;
 
 % TO DRAW FIGURE WR-PW CURVE:
-% figure(1)
-% title('MPP and Deloaded operation')
-% plot(v_wr,m_pw',':b');hold on;
-% plot(v_wrmpp,v_pwmpp,'-r');hold on;
-% plot(v_wrdel,v_pwdel,'-r');hold off;
+figure(1)
+title('MPP and Deloaded operation')
+plot(v_wr,m_pw',':b');hold on;
+plot(v_wrmpp,v_pwmpp,'-r');hold on;
+plot(v_wrdel,v_pwdel,'-r');hold off;

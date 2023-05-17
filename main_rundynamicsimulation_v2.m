@@ -16,14 +16,14 @@
     
     fbase = 50;
     tsimulation = 40;
-    t0 = 1;
+    t0 = 5;
     
     v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
     
     % initialise WG model
-    vw_ini        = 6;
+    vw_ini        = 5;
     t_wind_change = 20;
-    vw_after      = 6;
+    vw_after      = 5;
     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
     
     numWG         = 9;
@@ -123,9 +123,6 @@
     for i = 0:numWG-1
         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
     end
-%     set_param([powersystemdl(1:end-4) '/WindGenerator'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
-%     set_param([powersystemdl(1:end-4) '/WindGenerator1'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
-%     set_param([powersystemdl(1:end-4) '/WindGenerator2'],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
 
     % simulate each scenario
     for igenscenario = ngenscenarios:-1:1
@@ -249,33 +246,33 @@
                 ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
                 hold off;
                 
-                isim_wg = isim_wg + 4;
-
-                hf3 = figure;axes
-                ha3 = hf3.CurrentAxes;
-                for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
-                    plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
-                    isim_wg = isim_wg - 1;
-                end
-                title(['Power shedded by UFLS in Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-                legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
-                xlabel(ha2,'Time (s)')
-                ylabel(ha2,'Power shedded')
-                hold off;
-
 %                 isim_wg = isim_wg + 4;
 % 
-%                 hf4 = figure;axes
-%                 ha4 = hf4.CurrentAxes;
+%                 hf3 = figure;axes
+%                 ha3 = hf3.CurrentAxes;
 %                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
-%                     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
+%                     plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
 %                     isim_wg = isim_wg - 1;
 %                 end
-%                 title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-%                 legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
-%                 xlabel(ha4,'Time (s)')
-%                 ylabel(ha4,'WG penetration (%)')
+%                 title(['Power shedded by UFLS in Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+%                 legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
+%                 xlabel(ha2,'Time (s)')
+%                 ylabel(ha2,'Power shedded')
 %                 hold off;
+
+                isim_wg = isim_wg + 4;
+
+                hf4 = figure;axes
+                ha4 = hf4.CurrentAxes;
+                for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
+                    plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
+                    isim_wg = isim_wg - 1;
+                end
+                title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+                legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
+                xlabel(ha4,'Time (s)')
+                ylabel(ha4,'WG penetration (%)')
+                hold off;
                 
             end
         end
