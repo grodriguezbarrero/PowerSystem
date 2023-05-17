@@ -1,5 +1,5 @@
 function fun_setsimulinkblockparameters(powersystemdl,ngen,m_gendata,ness, ...
-    m_essdata,v_genscenario,v_igenonline,igenonline,v_iremgenonline,v_pshed0MW)
+    m_essdata,v_genscenario,v_igenonline,igenonline,v_iremgenonline) % v_pshed0MW
 
 % fun_prepareuflsformat4simulinkformat
 % Prepares and sets the parameters of the blocks of the Simulink model.
@@ -41,8 +41,8 @@ v_ag2 = m_gendata(10,v_iremgenonline);
 v_dpgmaxpu = (m_gendata(5,v_iremgenonline)-v_pinit)/Sbase;
 v_dpgminpu = (m_gendata(6,v_iremgenonline)-v_pinit)/Sbase;
 
-% load shedding in pu on system basis
-v_pshed0pu = v_pshed0MW/Sbase;
+% % load shedding in pu on system basis
+% v_pshed0pu = v_pshed0MW/Sbase;
 
 % get dynamic parameters of ess
 v_kesspu = m_essdata(2,1).*m_essdata(3,1)/Sbase;
@@ -76,8 +76,9 @@ set_param([powersystemdl,'/State-Space-ESS'],'A',mat2str(m_Aess),'B',mat2str(m_B
 set_param([powersystemdl '/Energylimits'],'dpmax',['[' sprintf('%f ',dpessmaxpu) ']'],'dpmin',['[' sprintf('%f ',dpessminpu) ']'],...
     'demax',['[' sprintf('%f ',deessmaxpu) ']'],'demin',['[' sprintf('%f ',deessminpu) ']'],'fracdemax',['[' sprintf('%f ',fracdeessmax) ']']);
 
-% set UFLS parameters (step size only)
-set_param([powersystemdl '/UFLS'],'v_pshed0pu',['[' sprintf('%f ',v_pshed0pu) ']']);
+% OJO
+% % set UFLS parameters (step size only)
+% set_param([powersystemdl '/UFLS'],'v_pshed0pu',['[' sprintf('%f ',v_pshed0pu) ']']);
 
 % set perturbation parameters (plost only)
 set_param([powersystemdl '/Perturbation'],'After',['[' sprintf('%f',plostpu) ']'],'Before','0');
