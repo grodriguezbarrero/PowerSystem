@@ -16,9 +16,9 @@ Sbase = sum(v_Mbase);
 % calculate the total generated power by CG
 pgenCGtot = 0;
 for i=1:ngen % iterate through every remaining generator
-    pgenCGtot = pgenCGtot + v_genscenario(v_iremgenonline(i));  % sum the power of the remaining generator in question
+    pgenCGtot = pgenCGtot + v_genscenario(v_iremgenonline(i));  % sum the power (in MW) of the remaining generator in question
 end
-pgenCGtot = pgenCGtot/Sbase;
+pgenCGtot = pgenCGtot/Sbase; % to make it in pu
 % ----
 
 % lost amount of power
@@ -76,7 +76,7 @@ set_param([powersystemdl,'/State-Space-ESS'],'A',mat2str(m_Aess),'B',mat2str(m_B
 set_param([powersystemdl '/Energylimits'],'dpmax',['[' sprintf('%f ',dpessmaxpu) ']'],'dpmin',['[' sprintf('%f ',dpessminpu) ']'],...
     'demax',['[' sprintf('%f ',deessmaxpu) ']'],'demin',['[' sprintf('%f ',deessminpu) ']'],'fracdemax',['[' sprintf('%f ',fracdeessmax) ']']);
 
-% OJO
+% This has been displaced to the main_rundynamicsimulation_v2
 % % set UFLS parameters (step size only)
 % set_param([powersystemdl '/UFLS'],'v_pshed0pu',['[' sprintf('%f ',v_pshed0pu) ']']);
 
