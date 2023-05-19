@@ -22,7 +22,7 @@
     
     % initialise WG model
     vw_ini        = 10;
-    t_wind_change = 60;
+    t_wind_change = 30;
     vw_after      = 8;
     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
     
@@ -82,7 +82,7 @@
     
     disp('Simulation start...');
     
-    nscenarios = 1;
+    nscenarios = 2;
     m_genscenarios = m_genscenarios(1:nscenarios,:); % REMOVE THIS TO GET ALL SCENARIOS
     
     % preallocate output cells
