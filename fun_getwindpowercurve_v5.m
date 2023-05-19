@@ -82,6 +82,11 @@ for i_extra_vw = 1:5
     v_Wrdel(nvw+i_extra_vw) = v_Wrdel(nvw) + i_extra_vw * (v_Wr(length(v_Wr))-v_Wrdel(nvw))/5;
 end
 
+% for i_extra_vw = 1:5
+%     v_pwmpp(nvw+i_extra_vw) = v_pwmpp(nvw);
+%     v_Wrmppp(nvw+i_extra_vw) = v_Wrmpp(nvw) + i_extra_vw * (v_Wr(length(v_Wr))-v_Wrmpp(nvw))/5;
+% end
+
 ipwmppn = find(v_pwmpp<=1,1,'last'); % nominal power (1 pu)
 Wrn = v_Wr(v_iwrmpp(ipwmppn)); % nominal speed
 v_wr = v_Wr/Wrn;
@@ -94,7 +99,7 @@ v_wrdel = v_Wrdel/Wrn; % speed corresponding to deloaded operation points
 wr0     = Wr0/Wrn;
 
 % TO DRAW FIGURE WR-PW CURVE:
-figure(1)
+figure;
 title('MPP and Deloaded operation')
 plot(v_wr,m_pw',':b');hold on;
 plot(v_wrmpp,v_pwmpp,'-r');hold on;
