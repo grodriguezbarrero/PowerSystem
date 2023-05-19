@@ -21,9 +21,9 @@
     v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
     
     % initialise WG model
-    vw_ini        = 8;
-    t_wind_change = 20;
-    vw_after      = 5;
+    vw_ini        = 10;
+    t_wind_change = 40;
+    vw_after      = 8;
     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
     
     numWG         = 9;
@@ -158,7 +158,7 @@
                     v_Mbase = m_gendata(4,v_iremgenonline);
                     Sbase = sum(v_Mbase);
 
-                    pdem = pdem_CG + nWGgroupsonline*3*pinitwindgen*1.5;  % total demand in MW
+                    pdem = pdem_CG + nWGgroupsonline*3*pinitwindgen*1.5;  % total demand in MW (Pn = 1.5 MW)
                     v_pshed0MW = v_pshed0/100*pdem;                    
 
                     v_pshed0pu = v_pshed0MW/Sbase;
@@ -191,6 +191,8 @@
     % Display frequency variations for different scenarios
     % -------------------------------------------------------------------------
     
+    close all;
+
     v_legend    = strings(1,nsimulations);
     v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#0076A8" "#0072BD" "#D95319"];
     
@@ -230,103 +232,52 @@
 
     for i_scenario = 1:num_scenarios            % iterate through each scenario
         for j_simulation = 1:num_gen_in_total   % iterate through every generator
-            
-            tiledlayout(3,1)
-            
+                        
             if m_genscenarios(i_scenario, j_simulation) ~= 0
                 % add new label to the legend. +10 is added because the
                 % generator number labels start at 11.
                 
-                hf = figure;
+                hf = figure('WindowState','maximized');
                 subplot(3,1,1);
 
                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
                     plot(c_t_wg{isim_wg},fbase+c_w_wg{isim_wg}*fbase,'Color',v_colours(sim_in_scenario_wg));hold on;
                     isim_wg = isim_wg - 1;
                 end
-                title(['Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+                title('Frequency');
                 legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
                 xlabel('Time (s)')
-                ylabel('Frequency deviation \Delta\omega (Hz)')
+                ylabel('Frequency \omega (Hz)') % ylabel('Frequency deviation \Delta\omega (Hz)')
                 hold off;
                 
                 subplot(3, 1, 2);
-%                 isim_wg = isim_wg + 4;
+                isim_wg = isim_wg + 4;
 
                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
                     plot(c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
                     isim_wg = isim_wg - 1;
                 end
-                title(['Power shedded by UFLS in Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+                title('Power shedded by UFLS');
                 legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
-                xlabel(ha3,'Time (s)')
-                ylabel(ha3,'Total power shedded by UFLS (pu)')
+                xlabel('Time (s)')
+                ylabel('Total power shedded by UFLS (pu)')
                 hold off;
                 
                 subplot(3, 1, 3);
-%                 isim_wg = isim_wg + 4;
+                isim_wg = isim_wg + 4;
 
                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
                     plot(c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
                     isim_wg = isim_wg - 1;
                 end
-                title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
+                title('WG penetration');
                 legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
                 xlabel('Time (s)')
                 ylabel('WG penetration (%)')
                 hold off;
                 
+                sgt = sgtitle(['Scenario ', num2str(i_scenario), ' with Bus ', num2str(j_simulation+10), ' shut off'],'Color',"#0072BD");
+                sgt.FontSize = 18;
             end
         end
     end
-
-%     for i_scenario = 1:num_scenarios            % iterate through each scenario
-%         for j_simulation = 1:num_gen_in_total   % iterate through every generator
-%             
-%             if m_genscenarios(i_scenario, j_simulation) ~= 0
-%                 % add new label to the legend. +10 is added because the
-%                 % generator number labels start at 11.
-%     
-%                 hf2 = figure;axes
-%                 ha2 = hf2.CurrentAxes;
-%                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
-%                     plot(ha2,c_t_wg{isim_wg},fbase+c_w_wg{isim_wg}*fbase,'Color',v_colours(sim_in_scenario_wg));hold on;
-%                     isim_wg = isim_wg - 1;
-%                 end
-%                 title(['Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-%                 legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
-%                 xlabel(ha2,'Time (s)')
-%                 ylabel(ha2,'Frequency deviation \Delta\omega (Hz)')
-%                 hold off;
-%                 
-%                 isim_wg = isim_wg + 4;
-% 
-%                 hf3 = figure;axes
-%                 ha3 = hf3.CurrentAxes;
-%                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
-%                     plot(ha3,c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
-%                     isim_wg = isim_wg - 1;
-%                 end
-%                 title(['Power shedded by UFLS in Scenario ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-%                 legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
-%                 xlabel(ha2,'Time (s)')
-%                 ylabel(ha2,'Total power shedded by UFLS (pu)')
-%                 hold off;
-% 
-%                 isim_wg = isim_wg + 4;
-% 
-%                 hf4 = figure;axes
-%                 ha4 = hf4.CurrentAxes;
-%                 for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
-%                     plot(ha4,c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
-%                     isim_wg = isim_wg - 1;
-%                 end
-%                 title(['WG penetration when ', num2str(i_scenario), ' with ',  num2str(j_simulation+10), ' shut off']);
-%                 legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
-%                 xlabel(ha4,'Time (s)')
-%                 ylabel(ha4,'WG penetration (%)')
-%                 hold off;
-%                 
-%             end
-%         end
-%     end

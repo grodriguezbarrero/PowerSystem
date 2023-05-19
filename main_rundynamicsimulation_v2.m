@@ -22,7 +22,7 @@
     
     % initialise WG model
     vw_ini        = 10;
-    t_wind_change = 20;
+    t_wind_change = 60;
     vw_after      = 8;
     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
     
