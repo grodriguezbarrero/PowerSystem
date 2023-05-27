@@ -82,7 +82,7 @@
     
     disp('Simulation start...');
     
-    nscenarios = 2;
+    nscenarios = 1;
     m_genscenarios = m_genscenarios(1:nscenarios,:); % REMOVE THIS TO GET ALL SCENARIOS
     
     % preallocate output cells
@@ -276,7 +276,7 @@
                 ylabel('WG penetration (%)')
                 hold off;
                 
-                sgt = sgtitle(['Scenario ', num2str(i_scenario), ' with Bus ', num2str(j_simulation+10), ' shut off'],'Color',"#0072BD");
+                sgt = sgtitle(['Scenario ', num2str(i_scenario), ' with Bus ', num2str(j_simulation+10), ' shut off, $v_{-}($', num2str(t_wind_change), '$s)=$', num2str(vw_ini), 'm/s , $v_{+}($', num2str(t_wind_change), '$s)=$', num2str(vw_after), 'm/s'],'Color',"#0072BD", 'interpreter','latex');
                 sgt.FontSize = 18;
             end
         end
