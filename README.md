@@ -1,3 +1,3 @@
 # PowerSystem
 
-Run the 'main_rundynamicsimulation' file.
+Run the 'main_rundynamicsimulation_v2' file.
