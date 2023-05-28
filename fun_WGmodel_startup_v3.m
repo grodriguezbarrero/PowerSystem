@@ -1,5 +1,5 @@
-function [wr0, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
-    v_wrmpp,v_pwdel,v_wrdel] = fun_WGmodel_startup_v3(pinitwindgen)
+function [vw0, wr0, pinitwindgen, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
+    v_wrmpp,v_pwdel,v_wrdel] = fun_WGmodel_startup_v3(pinitwindgenMW)
 
 
 % function [pinitwindgen, wr0, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
@@ -30,7 +30,7 @@ numWG = 9;
 %% Setting up the LUTs and the initial equilibrium point
 v_vw    = 5:.5:12;
 
-[m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel,pinitwindgen,wr0] = fun_getwindpowercurve_v5(0,v_vw,pinitwingenMW);
+[m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel,vw0,wr0, pinitwindgen] = fun_getwindpowercurve_v5(0,v_vw,pinitwindgenMW);
 
 %% Set predefined WG parameters on Simulink model
 

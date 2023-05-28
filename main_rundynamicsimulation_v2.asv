@@ -123,8 +123,7 @@
     
     set_param(powersystemdl(1:end-4),'StopTime',sprintf('%f',tsimulation));
     
-    set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_wind_change) ']'], 'After',['[' sprintf('%f',vw_after) ']'], ...
-        'Before',['[' sprintf('%f',vw_ini) ']']);
+    
     
 %     for i = 0:numWG-1
 %         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
@@ -134,11 +133,19 @@
     for igenscenario = ngenscenarios:-1:1
         
         fprintf('Scenario: %i', igenscenario);
+        
+        pinitwindgen = v_pwg(igenscenario);
+
+        % initialise the WGs for each scenario
+        [vw0, wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(pinitwindgen);
 
         for i = 0:numWG-1
-            set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',v_pwg(igenscenario)),'wr0',sprintf('%f',wr0));
+            set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
         end
-        
+        % initialise the wind speed according to 
+        set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_wind_change) ']'], 'After',['[' sprintf('%f',vw_after) ']'], ...
+        'Before',['[' sprintf('%f',vw_ini) ']']);
+
         % get generation scenario
         v_genscenario = m_genscenarios(igenscenario,:); % generation of each unit in MW
         pdem_CG = sum(v_genscenario); % demand = sum of generation (in MW)

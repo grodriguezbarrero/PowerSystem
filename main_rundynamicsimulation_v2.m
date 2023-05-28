@@ -15,14 +15,14 @@
     str_rocoftype = 'rocof';
     
     fbase = 50;
-    tsimulation = 60;
-    t0 = 5;
+    tsimulation = 40;
+    t0 = 2;
     
     v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
     
     % initialise WG model
 %     vw_ini        = 10;
-%     t_wind_change = 30;
+    t_wind_change = 20;
 %     vw_after      = 8;
 %     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
     
@@ -56,7 +56,8 @@
         m_gendata(5,igen) = max([m_genscenarios(v_idxcommitted,igen);m_gendata(5,igen)]); % pmin
     end
 
-    
+    % Read Nominal Power of WG
+    Pn = m_gendata(4,ngen+1);
     
     % read ufls parameters
     [m_uflsparam,c_uflsID] = xlsread(xlsfilename,c_sheets{4}); 
@@ -123,8 +124,7 @@
     
     set_param(powersystemdl(1:end-4),'StopTime',sprintf('%f',tsimulation));
     
-    set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_wind_change) ']'], 'After',['[' sprintf('%f',vw_after) ']'], ...
-        'Before',['[' sprintf('%f',vw_ini) ']']);
+    
     
 %     for i = 0:numWG-1
 %         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
@@ -135,15 +135,19 @@
         
         fprintf('Scenario: %i', igenscenario);
         
-        pinitwindgen = v_pwg(igenscenario);
+        pinitwindgen = v_pwg(igenscenario); % in MW
 
         % initialise the WGs for each scenario
-        [wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(pinitwindgen);
+        [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(pinitwindgen); % in pu
+        vw_after = vw0 - 1;
 
         for i = 0:numWG-1
             set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
         end
-        
+        % initialise the wind speed
+        set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_wind_change) ']'], 'After',['[' sprintf('%f',vw_after) ']'], ...
+        'Before',['[' sprintf('%f',vw0) ']']);
+
         % get generation scenario
         v_genscenario = m_genscenarios(igenscenario,:); % generation of each unit in MW
         pdem_CG = sum(v_genscenario); % demand = sum of generation (in MW)
@@ -173,7 +177,7 @@
                     v_Mbase = m_gendata(4,v_iremgenonline);
                     Sbase = sum(v_Mbase);
 
-                    pdem = pdem_CG + nWGgroupsonline*3*pinitwindgen*1.5;  % total demand in MW (Pn = 1.5 MW)
+                    pdem = pdem_CG + nWGgroupsonline*3*pinitwindgen*Pn;  % total demand in MW (Pn = 1.5 MW)
                     v_pshed0MW = v_pshed0/100*pdem;                    
 
                     v_pshed0pu = v_pshed0MW/Sbase;
@@ -206,7 +210,7 @@
     % Display frequency variations for different scenarios
     % -------------------------------------------------------------------------
     
-    close all;
+%     close all;
 
     v_legend    = strings(1,nsimulations);
     v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#0076A8" "#0072BD" "#D95319"];
@@ -291,7 +295,7 @@
                 ylabel('WG penetration (%)')
                 hold off;
                 
-                sgt = sgtitle(['Scenario ', num2str(i_scenario), ' with Bus ', num2str(j_simulation+10), ' shut off, $v_{-}($', num2str(t_wind_change), '$s)=$', num2str(vw_ini), 'm/s , $v_{+}($', num2str(t_wind_change), '$s)=$', num2str(vw_after), 'm/s'],'Color',"#0072BD", 'interpreter','latex');
+                sgt = sgtitle(['Scenario ', num2str(i_scenario), ' with Bus ', num2str(j_simulation+10), ' shut off, $v_{-}($', num2str(t_wind_change), '$s)=$', num2str(vw0), 'm/s , $v_{+}($', num2str(t_wind_change), '$s)=$', num2str(vw_after), 'm/s'],'Color',"#0072BD", 'interpreter','latex');
                 sgt.FontSize = 18;
             end
         end
