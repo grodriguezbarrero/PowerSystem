@@ -34,16 +34,16 @@
     
     disp('Reading data...');
     
-    xlsfilename = 'LaPalmaInputData_noESS.xls';
+    xlsfilename = 'LaPalmaInputData_noESS_withoutFCUC.xls';
     
     [status, c_sheets] = xlsfinfo(xlsfilename);
     
     % read generator dynamic model data
-    m_gendata = xlsread(xlsfilename,c_sheets{1}); 
+    m_gendata = xlsread(xlsfilename,c_sheets{1});
     
      % read generation scenarios
     m_genscenarios = xlsread(xlsfilename,c_sheets{3});
-    m_genscenarios = m_genscenarios(2:end,2:end); % delete first row and column
+    m_genscenarios = m_genscenarios(2:end,2:end-1); % delete first row and column
     
     % correct max and min generation output
     ngen = size(m_gendata,2);
@@ -82,7 +82,7 @@
     
     disp('Simulation start...');
     
-    nscenarios = 1;
+    nscenarios = 2;
     m_genscenarios = m_genscenarios(1:nscenarios,:); % REMOVE THIS TO GET ALL SCENARIOS
     
     % preallocate output cells
