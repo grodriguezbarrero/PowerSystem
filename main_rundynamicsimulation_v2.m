@@ -88,7 +88,7 @@
     
     disp('Simulation start...');
     
-    nscenarios      = 1;
+    nscenarios      = 2;
     m_genscenarios  = m_genscenarios(1:nscenarios,:); % REMOVE THIS TO GET ALL SCENARIOS
     v_pwg           = v_pwg(1:nscenarios);
     
