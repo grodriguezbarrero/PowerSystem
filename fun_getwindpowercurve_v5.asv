@@ -1,6 +1,6 @@
 % function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, pinitwindgen, wr0] = fun_getwindpowercurve_v5(v_beta,v_vw, vw_in)
 
-function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0] = fun_getwindpowercurve_v5(v_beta,v_vw, pinitwindgen)
+function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve_v5(v_beta,v_vw, pinitwindgenMW)
 
 % This newer version initialises a bunch of the variables used to zero.
 % Requires: wind speeds, initial wind speed
@@ -18,14 +18,18 @@ function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0] = fun_getwindpowe
 deload = 0.1; % percentage of deloading
 rho = 1.275; % air density
 
+% Rb = 172/2;
+% Pn = 7e6;
+% v_Wr = 0:0.01:2;
+
 % 1.5 MW wind generator data
 Rb = 31.2; % blade radius (m)
-% Rb = 172/2;
-Aw = Rb^2*pi; % surface 
 Pn = 1.5e6; % nominal power (MW)
-% Pn = 7e6;
 v_cp = [0.73, 151, 0.58, 0.002, 2.14, 13.2, 18.4, -0.02, -0.003]; % performance coefficients
 v_Wr = 0:0.01:5; % rotor speed range (rad/s)
+Aw = Rb^2*pi; % surface
+
+pinitwindgen = pinitwindgenMW/(Pn * 1e-6);
 
 nvw = length(v_vw);
 nwr = length(v_Wr);
@@ -95,15 +99,10 @@ for iw = nvw:-1:1
     [~,v_iwrdel(iw)] = min(abs(m_pw(iw,v_iwrmpp(iw):end) - v_pwdel(iw)));
     v_Wrdel(iw)      = v_Wr(v_iwrmpp(iw)+v_iwrdel(iw)); % gives the corresponding wr
     
-    if iw == i_pinitwindgen_lower                 % if we're dealing with a certain wind speed
-        Wr0_lower   = v_Wrdel(iw);                      % store it's corresponding rotor speed
-    elseif iw == i_pinitwindgen_higher
-        Wr0_higher  = v_Wrdel(iw);
-    end
-
 end
 
-Wr0_lower   = v_Wrdel(i_pinitwindgen_lower); 
+Wr0_lower   = v_Wrdel(i_pinitwindgen_lower);
+Wr0_higher  = v_Wrdel(i_pinitwindgen_higher);
 
 %interpolate
 Wr0 = Wr0_lower + ...

@@ -18,15 +18,16 @@ function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = f
 deload = 0.1; % percentage of deloading
 rho = 1.275; % air density
 
+% Rb = 172/2;
+% Pn = 7e6;
+% v_Wr = 0:0.01:2;
+
 % 1.5 MW wind generator data
-% Rb = 31.2; % blade radius (m)
-Rb = 172/2;
-Aw = Rb^2*pi; % surface 
-% Pn = 1.5e6; % nominal power (MW)
-Pn = 7e6;
+Rb = 31.2; % blade radius (m)
+Pn = 1.5e6; % nominal power (MW)
 v_cp = [0.73, 151, 0.58, 0.002, 2.14, 13.2, 18.4, -0.02, -0.003]; % performance coefficients
-%v_Wr = 0:0.01:5; % rotor speed range (rad/s)
-v_Wr = 0:0.01:2;
+v_Wr = 0:0.01:5; % rotor speed range (rad/s)
+Aw = Rb^2*pi; % surface
 
 pinitwindgen = pinitwindgenMW/(Pn * 1e-6);
 
