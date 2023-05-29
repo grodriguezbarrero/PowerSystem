@@ -15,7 +15,7 @@
     str_rocoftype = 'rocof';
     
     fbase = 50;
-    tsimulation = 40;
+    tsimulation = 60;
     t0 = 2;
     
     v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
