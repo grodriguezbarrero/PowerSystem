@@ -5,7 +5,8 @@
 % -------------------------------------------------------------------------
 % Predefined values
 % -------------------------------------------------------------------------
-close all;
+% close all;
+tic
 
 powersystemdl = 'Powersystem.slx';
 
@@ -15,7 +16,7 @@ str_uftype = 'uf';
 str_rocoftype = 'rocof';
 
 fbase = 50;
-tsimulation = 20;
+tsimulation = 35;
 t0 = 5;
 
 v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
@@ -158,6 +159,9 @@ for igenscenario = ngenscenarios:-1:1
         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
     end
 
+    % initialise initial wind speed
+    set_param([powersystemdl(1:end-4) '/Wind'], 'Before',['[' sprintf('%f',vw0) ']']);
+
     % get generation scenario
     v_genscenario = m_genscenarios(igenscenario,:); % generation of each unit in MW
     pdem_CG = sum(v_genscenario); % demand = sum of generation (in MW)
@@ -177,7 +181,7 @@ for igenscenario = ngenscenarios:-1:1
 
         % set model parameters
         fun_setsimulinkblockparameters(powersystemdl(1:end-4),ngen,m_gendata,ness,m_essdata, ...
-            v_genscenario,v_igenonline,igenonline,v_iremgenonline); %v_pshed0MW
+            v_genscenario,v_igenonline,igenonline,v_iremgenonline, Pn); %v_pshed0MW
         
         for WGgroupsonline = 1:3
             
@@ -222,7 +226,13 @@ for igenscenario = ngenscenarios:-1:1
                         c_WGpenetration_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}] = sim(powersystemdl);
                     % isim_wg = isim_wg - 1;
                     
-                    
+                    c_pgentot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}    = ...
+                        Sbase * c_pgentot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
+                    c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}      = ...
+                        Sbase * c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
+                    c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}  = ...
+                        Sbase * c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
+
                     i_t_delta_vw = i_t_delta_vw + 1;
                 end
                 i_delta_vw = i_delta_vw + 1;
@@ -324,50 +334,76 @@ v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#007
 %% -----------------------new-code-------------------------
 
 hf = figure('WindowState','maximized');
-subplot(3,1,1);
+subplot(5,1,1);
 
 % Choose scenario here
-igenscenario    = 2;
-igenonline      = 3; % bus number being disconnected
-WGgroupsonline  = 3;
-i_delta_vw      = 3; % 1 m/s
-i_t_delta_vw    = 3; % 2s after
+igenscenario    = 1; % 1, 2, ... 24
+igenonline      = 1; % bus number being disconnected
+WGgroupsonline  = 1; % 1, 2, 3 WGs
+i_delta_vw      = 1; % 0, 0.5, 1 m/s
+i_t_delta_vw    = 1; % 2s before, 0s, 2s after
 
 for WGgroupsonline = 1:3
     plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         fbase+c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}*fbase, ...
         'Color',v_colours(WGgroupsonline));hold on;
 end
-title('Frequency');
+% title('Frequency');
 legend('3 WGs', '6 WGs', '9 WGs');
-xlabel('Time (s)')
-ylabel('Frequency \omega (Hz)') % ylabel('Frequency deviation \Delta\omega (Hz)')
+% xlabel('Time (s)')
+ylabel('Freq \omega (Hz)') % ylabel('Frequency deviation \Delta\omega (Hz)')
 hold off;
 
-subplot(3, 1, 2);
+subplot(5, 1, 2);
 
 for WGgroupsonline = 1:3
     plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         'Color',v_colours(WGgroupsonline));hold on;
 end
-title('Power shedded by UFLS');
+% title('Power shedded by UFLS');
 % legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
-xlabel('Time (s)')
+% xlabel('Time (s)')
 ylabel('Total power shedded by UFLS (pu)')
 hold off;
 
-subplot(3, 1, 3);
+subplot(5, 1, 3);
 
 for WGgroupsonline = 1:3
     plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         c_WGpenetration_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         'Color',v_colours(WGgroupsonline));hold on;
 end
-title('WG penetration');
+% title('WG penetration');
+% legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
+% xlabel('Time (s)')
+ylabel('WG pen. (%)')
+hold off;
+
+subplot(5, 1, 4);
+
+for WGgroupsonline = 1:3
+    plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
+        c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
+        'Color',v_colours(WGgroupsonline));hold on;
+end
+% title('Total Power generated by WGs');
+% legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
+% xlabel('Time (s)')
+ylabel('Tot P WG (pu)')
+hold off;
+
+subplot(5, 1, 5);
+
+for WGgroupsonline = 1:3
+    plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
+        c_pgentot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
+        'Color',v_colours(WGgroupsonline));hold on;
+end
+% title('Total Power generated');
 % legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
 xlabel('Time (s)')
-ylabel('WG penetration (%)')
+ylabel('Tot P (pu)')
 hold off;
 
 sgt = sgtitle(['Scenario ', num2str(igenscenario), ' with the number ', num2str(igenonline), ' Bus shut off'],'Color',"#0072BD", 'interpreter','latex');
@@ -435,3 +471,5 @@ sgt.FontSize = 18;
 %         end
 %     end
 % end
+
+toc

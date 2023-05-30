@@ -1,5 +1,5 @@
 function fun_setsimulinkblockparameters(powersystemdl,ngen,m_gendata,ness, ...
-    m_essdata,v_genscenario,v_igenonline,igenonline,v_iremgenonline) % v_pshed0MW
+    m_essdata,v_genscenario,v_igenonline,igenonline,v_iremgenonline, Pn) % v_pshed0MW
 
 % fun_prepareuflsformat4simulinkformat
 % Prepares and sets the parameters of the blocks of the Simulink model.
@@ -85,10 +85,10 @@ set_param([powersystemdl '/Perturbation'],'After',['[' sprintf('%f',plostpu) ']'
 
 % WG-RELATED PARAMETERS
 % set system base change parameters (System base only, where the system base is the sum of the Mbase's of the CG)
-set_param([powersystemdl '/SystemBaseChange'],'Gain',['[1.5/' sprintf('%f',Sbase) ']']);
+set_param([powersystemdl '/SystemBaseChange'],'Gain',['[' sprintf('%f',Pn) '/' sprintf('%f',Sbase) ']']);
 
 % set system base change parameters (System base only, where the system base is the sum of the Mbase's of the CG)
-set_param([powersystemdl '/SystemBaseChange1'],'Gain',['[1.5/' sprintf('%f',Sbase) ']']);
+set_param([powersystemdl '/SystemBaseChange1'],'Gain',['[' sprintf('%f',Pn) '/' sprintf('%f',Sbase) ']']);
 
 % set total generated power by the CG (the actual one; not the change in
 % power generation)
