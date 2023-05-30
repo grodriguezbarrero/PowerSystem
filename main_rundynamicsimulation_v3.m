@@ -235,13 +235,15 @@ for igenscenario = ngenscenarios:-1:1
                         Sbase * c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
                     c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}  = ...
                         Sbase * c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
+                    c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}          = ...
+                        fbase + fbase * c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
                     
-                    % store relevant characteristics
-                    m_fss(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)      = ...
+                    % store igenscenario characteristics
+                    m_fss(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw)      = ...
                         c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}(end);
-                    m_fss(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)      = ...
+                    m_fmin(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw)      = ...
                         min(c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw});
-                    m_pufls(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)    = ...
+                    m_pufls(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw)    = ...
                         c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}(end);
 
                     i_t_delta_vw = i_t_delta_vw + 1;
@@ -269,14 +271,14 @@ subplot(5,1,1);
 
 % Choose scenario here
 igenscenario    = 1; % 1, 2, ... 24
-igenonline      = 3; % bus number being disconnected
+igenonline      = 1; % bus number being disconnected
 % WGgroupsonline  = 2; % 1, 2, 3 WGs
-i_delta_vw      = 2; % 0, 0.5, 1 m/s
-i_t_delta_vw    = 1; % 2s before, 0s, 2s after
+i_delta_vw      = 1; % 0, 0.5, 1 m/s
+i_t_delta_vw    = 2; % 2s before, 0s, 2s after
 
 for WGgroupsonline = 1:3
     plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
-        fbase+c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}*fbase, ...
+        c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         'Color',v_colours(WGgroupsonline));hold on;
 end
 % title('Frequency');
