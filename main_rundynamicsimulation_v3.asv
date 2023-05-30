@@ -128,6 +128,10 @@ c_pufls_wg          = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, n
 c_pgenWGtot_wg      = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
 c_WGpenetration_wg  = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
 
+m_fmin  = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
+m_fss   = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
+m_pufls = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
+
 isim_wg = nsimulations_wg;
 
 ngenscenarios = size(m_genscenarios,1);
@@ -216,7 +220,6 @@ for igenscenario = ngenscenarios:-1:1
                     % initialise the time of the wind speed change
                     set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_delta_vw) ']']);
                     
-                    
                     % simulate it and store results
                     [c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw},~, ...
                         c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
@@ -224,14 +227,22 @@ for igenscenario = ngenscenarios:-1:1
                         c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
                         c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
                         c_WGpenetration_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}] = sim(powersystemdl);
-                    % isim_wg = isim_wg - 1;
                     
+                    % change from pu units to MWs
                     c_pgentot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}    = ...
                         Sbase * c_pgentot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
                     c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}      = ...
                         Sbase * c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
                     c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}  = ...
                         Sbase * c_pgenWGtot_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw};
+                    
+                    % store relevant characteristics
+                    m_fss(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)      = ...
+                        c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}(end);
+                    m_fss(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)      = ...
+                        min(c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw});
+                    m_pufls(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)    = ...
+                        c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}(end);
 
                     i_t_delta_vw = i_t_delta_vw + 1;
                 end
@@ -321,26 +332,22 @@ disp('Simulation stops.');
 
 % close_system(powersystemdl,0);
 
-%% -------------------------------------------------------------------------
+%% ------------------------------------------------------------------------
 % Display frequency variations for different scenarios
 % -------------------------------------------------------------------------
 
 %     close all;
 
-v_legend    = strings(1,nsimulations);
 v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#0076A8" "#0072BD" "#D95319"];
-
-
-%% -----------------------new-code-------------------------
 
 hf = figure('WindowState','maximized');
 subplot(5,1,1);
 
 % Choose scenario here
 igenscenario    = 1; % 1, 2, ... 24
-igenonline      = 1; % bus number being disconnected
-WGgroupsonline  = 2; % 1, 2, 3 WGs
-i_delta_vw      = 1; % 0, 0.5, 1 m/s
+igenonline      = 3; % bus number being disconnected
+% WGgroupsonline  = 2; % 1, 2, 3 WGs
+i_delta_vw      = 2; % 0, 0.5, 1 m/s
 i_t_delta_vw    = 1; % 2s before, 0s, 2s after
 
 for WGgroupsonline = 1:3
@@ -364,7 +371,7 @@ end
 % title('Power shedded by UFLS');
 % legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
 % xlabel('Time (s)')
-ylabel('Tot P shedded by UFLS (MW)')
+ylabel('P_{shedded}^{UFLS} (MW)')
 hold off;
 
 subplot(5, 1, 3);
@@ -409,67 +416,5 @@ hold off;
 sgt = sgtitle(['Scenario ', num2str(igenscenario), ' with the number ', num2str(igenonline), ' Bus shut off'],'Color',"#0072BD", 'interpreter','latex');
 sgt.FontSize = 18;
 
-%% --------------------------------------------------------
-
-
-% % m_genscenarios
-% num_scenarios           = length(m_genscenarios(:,1));
-% num_gen_in_total        = length(m_genscenarios(1,:));
-% isim = nsimulations;
-% 
-% isim_wg = nsimulations_wg;
-% 
-% 
-% for i_scenario = 1:num_scenarios            % iterate through each scenario
-%     for j_simulation = 1:num_gen_in_total   % iterate through every generator
-%                     
-%         if m_genscenarios(i_scenario, j_simulation) ~= 0
-%             % add new label to the legend. +10 is added because the
-%             % generator number labels start at 11.
-%             
-%             hf = figure('WindowState','maximized');
-%             subplot(3,1,1);
-% 
-%             for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 1, 2, and 3 WGs
-%                 plot(c_t_wg{isim_wg},fbase+c_w_wg{isim_wg}*fbase,'Color',v_colours(sim_in_scenario_wg));hold on;
-%                 isim_wg = isim_wg - 1;
-%             end
-%             title('Frequency');
-%             legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
-%             xlabel('Time (s)')
-%             ylabel('Frequency \omega (Hz)') % ylabel('Frequency deviation \Delta\omega (Hz)')
-%             hold off;
-%             
-%             subplot(3, 1, 2);
-%             isim_wg = isim_wg + 4;
-% 
-%             for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
-%                 plot(c_t_wg{isim_wg},c_pufls_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
-%                 isim_wg = isim_wg - 1;
-%             end
-%             title('Power shedded by UFLS');
-%             legend('Zero WG', '3 WG', '6 WGs', '9 WGs');
-%             xlabel('Time (s)')
-%             ylabel('Total power shedded by UFLS (pu)')
-%             hold off;
-%             
-%             subplot(3, 1, 3);
-%             isim_wg = isim_wg + 4;
-% 
-%             for sim_in_scenario_wg = 1:4   % four sub-scenarios: 0, 3, 6, and 9 WGs
-%                 plot(c_t_wg{isim_wg},c_WGpenetration_wg{isim_wg},'Color',v_colours(sim_in_scenario_wg));hold on;
-%                 isim_wg = isim_wg - 1;
-%             end
-%             title('WG penetration');
-%             legend('Zero WG', '3 WGs', '6 WGs', '9 WGs');
-%             xlabel('Time (s)')
-%             ylabel('WG penetration (%)')
-%             hold off;
-%             
-%             sgt = sgtitle(['Scenario ', num2str(i_scenario), ' with Bus ', num2str(j_simulation+10), ' shut off, $v_{-}($', num2str(t_wind_change), '$s)=$', num2str(vw0), 'm/s , $v_{+}($', num2str(t_wind_change), '$s)=$', num2str(vw_after), 'm/s'],'Color',"#0072BD", 'interpreter','latex');
-%             sgt.FontSize = 18;
-%         end
-%     end
-% end
 
 toc
