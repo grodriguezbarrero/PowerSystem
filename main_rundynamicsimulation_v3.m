@@ -271,10 +271,10 @@ subplot(5,1,1);
 
 % Choose scenario here
 igenscenario    = 1; % 1, 2, ... 24
-igenonline      = 1; % bus number being disconnected
+igenonline      = 3; % bus number being disconnected
 % WGgroupsonline  = 2; % 1, 2, 3 WGs
-i_delta_vw      = 1; % 0, 0.5, 1 m/s
-i_t_delta_vw    = 1; % 2s before, 0s, 2s after
+i_delta_vw      = 3; % 0, 0.5, 1 m/s
+i_t_delta_vw    = 3; % 2s before, 0s, 2s after
 
 for WGgroupsonline = 1:3
     plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
