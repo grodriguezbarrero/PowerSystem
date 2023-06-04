@@ -1,9 +1,12 @@
-% function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, pinitwindgen, wr0] = fun_getwindpowercurve_v5(v_beta,v_vw, vw_in)
-
 function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve_v5(v_beta,v_vw, pinitwindgenMW)
 
+% Debugging:
+% v_beta = 0;
+% v_vw = 5:0.5:12;
+% pinitwindgenMW = .67;
+
 % This newer version initialises a bunch of the variables used to zero.
-% Requires: wind speeds, initial wind speed
+% Requires: wind speeds, initial wind speed, initial power
 % Provides: curve, equilibrium
 
 % This function computes the power-speed curves for wind generation.
@@ -148,10 +151,19 @@ v_wrdel = v_Wrdel/Wrn; % speed corresponding to deloaded operation points
 
 wr0     = Wr0/Wrn;
 
-% TO DRAW FIGURE WR-PW CURVE:
+%% TO DRAW FIGURE WR-PW CURVE:
 figure;
 title('MPP and Deloaded operation')
-plot(v_wr,m_pw',':b');hold on;
+% plot(v_wr,m_pw',':b');hold on;
 plot(v_wrmpp,v_pwmpp,'-r');hold on;
-plot(wr0,pinitwindgen,'*');hold on;
-plot(v_wrdel,v_pwdel,'-r');hold off;
+plot(v_wrdel,v_pwdel,'-b');hold on;
+legend('MPP','Deloaded')
+plot(wr0,pinitwindgen,'*', 'linewidth',4,'HandleVisibility','off');hold on;
+
+plot(v_wr,m_pw',':b', 'HandleVisibility','off');hold on;
+xlabel('Rotor speed (pu)')
+ylabel('Mechanical power (pu)')
+% legend(['', '','','','','','','','','','','','','','','','','','','','','','','', 'MPP', 'Deloaded'])
+hold off;
+sgt = sgtitle('Power-speed curve', 'interpreter','latex');
+sgt.FontSize = 18;

@@ -1,5 +1,5 @@
 function [vw0, wr0, pinitwindgen, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
-    v_wrmpp,v_pwdel,v_wrdel] = fun_WGmodel_startup_v3(pinitwindgenMW)
+    v_wrmpp,v_pwdel,v_wrdel] = fun_WGmodel_startup_v3(powersystemdl, pinitwindgenMW)
 
 
 % function [pinitwindgen, wr0, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
@@ -9,7 +9,7 @@ function [vw0, wr0, pinitwindgen, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ..
 % This function sets up the parameters of the WG and inserts them into the
 % Powersystem Simulink model.
 
-powersystemdl = 'Powersystem';
+% powersystemdl = 'Powersystem';
 load_system(powersystemdl);
 
 

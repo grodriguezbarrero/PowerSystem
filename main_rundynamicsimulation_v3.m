@@ -157,7 +157,7 @@ for igenscenario = ngenscenarios:-1:1
     pinitwindgen = v_pwg(igenscenario); % in MW
 
     % initialise the WGs for each scenario
-    [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(pinitwindgen); % in pu
+    [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(powersystemdl(1:end-4), pinitwindgen); % in pu
 
     for i = 0:numWG-1
         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
@@ -273,7 +273,7 @@ subplot(5,1,1);
 igenscenario    = 1; % 1, 2, ... 24
 igenonline      = 1; % bus number being disconnected
 % WGgroupsonline  = 2; % 1, 2, 3 WGs
-i_delta_vw      = 3; % 0, 0.5, 1 m/s
+i_delta_vw      = 1; % 0, 0.5, 1 m/s
 i_t_delta_vw    = 1; % 2s before, 0s, 2s after
 
 for WGgroupsonline = 1:3
