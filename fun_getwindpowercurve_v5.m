@@ -1,8 +1,9 @@
-function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve_v5(v_beta,v_vw, pinitwindgenMW)
+function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve_v5(v_beta,v_vw, pinitwindgenMW, Pn, diameter)
 
 % Debugging:
 % v_beta = 0;
 % v_vw = 5:0.5:12;
+% pinitwindgenMW = .829;
 % pinitwindgenMW = .67;
 
 % This newer version initialises a bunch of the variables used to zero.
@@ -10,10 +11,10 @@ function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = f
 % Provides: curve, equilibrium
 
 % This function computes the power-speed curves for wind generation.
-% The power-speed curve of a 1.5 MW wind generator is used for this
+% The power-speed curve of a wind generator is used for this
 % purpose. The resulting curve must be appropriately scaled.
 %
-% Input:    angle of attack, beta, and wind speed, vw
+% Input:    angle of attack (beta), wind speed (vw), initial P (pinitwindgen), nominal P (Pn), rotor diameter 
 % Output:   wind power, pw; rotor speed, wr; MPP power, pwmpp; MPP rotor
 %           speed, wrmpp; deloaded power, pwdel; deloaded rotor speed,
 %           wrdel
@@ -21,15 +22,26 @@ function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = f
 deload = 0.1; % percentage of deloading
 rho = 1.275; % air density
 
+% 7 MW wind generator data
 % Rb = 172/2;
 % Pn = 7e6;
 % v_Wr = 0:0.01:2;
 
 % 1.5 MW wind generator data
-Rb = 31.2; % blade radius (m)
-Pn = 1.5e6; % nominal power (MW)
+% Rb = 31.2; % blade radius (m)
+% Pn = 2.5e6; % nominal power (MW)
+% v_Wr = 0:0.01:5; % rotor speed range (rad/s)
+
+% 2.5 MW wind generator data
+% Pn = 2.5e6; % nominal power (MW)
+% diameter = 84; % diameter (m)
+v_Wr = 0:0.01:3.4; % rotor speed range (rad/s)
+
+Pn = Pn * 1e6;      % 
+Rb = diameter/2; % blade radius (m)
+
 v_cp = [0.73, 151, 0.58, 0.002, 2.14, 13.2, 18.4, -0.02, -0.003]; % performance coefficients
-v_Wr = 0:0.01:5; % rotor speed range (rad/s)
+
 Aw = Rb^2*pi; % surface
 
 pinitwindgen = pinitwindgenMW/(Pn * 1e-6);
@@ -67,26 +79,6 @@ v_iwrdel= zeros(1,nvw);
 v_wrdel = zeros(1,nvw+5);
 v_Wrdel = zeros(1,nvw+5);
 
-% for i=1:nvw
-%     if v_vw(i) == vw_in
-%         i_input_vw = i;
-%     end
-% end
-
-% % look for the value closest to pw_del on the right hand side of pmax and
-% % take note of the index. Then obtain the associated wr
-% for iw = nvw:-1:1
-%     % it takes the right half of the curve after the MPP point corresponding to that
-%     % particular wind speed, and gets its index of the deloaded power
-%     [~,v_iwrdel(iw)] = min(abs(m_pw(iw,v_iwrmpp(iw):end) - v_pwdel(iw)));
-%     v_Wrdel(iw)      = v_Wr(v_iwrmpp(iw)+v_iwrdel(iw)); % gives the corresponding wr
-%     if iw == i_input_vw                     % if we're dealing with the input speed
-%         Wr0             = v_Wrdel(iw);      % store it's corresponding speed
-%         pinitwindgen    = v_pwdel(iw);      % and deloaded power
-%     end
-% end
-
-
 % find closest deloaded value that corresponds to pinitwindgen
 i_pinitwindgen_lower  = find(v_pwdel <= pinitwindgen,1,'last');
 i_pinitwindgen_higher = find(v_pwdel >= pinitwindgen,1,'first');
@@ -101,32 +93,14 @@ for iw = nvw:-1:1
 
     [~,v_iwrdel(iw)] = min(abs(m_pw(iw,v_iwrmpp(iw):end) - v_pwdel(iw)));
     v_Wrdel(iw)      = v_Wr(v_iwrmpp(iw)+v_iwrdel(iw)); % gives the corresponding wr
-    
 end
 
 Wr0_lower   = v_Wrdel(i_pinitwindgen_lower);
 Wr0_higher  = v_Wrdel(i_pinitwindgen_higher);
 
-%interpolate
+% interpolate
 Wr0 = Wr0_lower + ...
     (Wr0_higher-Wr0_lower)*(pinitwindgen-v_pwdel(i_pinitwindgen_lower))/(v_pwdel(i_pinitwindgen_higher)-v_pwdel(i_pinitwindgen_lower));
-
-% for iw = nvw:-1:1
-%     % it takes the right half of the curve after the MPP point corresponding to that
-%     % particular wind speed
-% 
-%     [~,v_iwrdel(iw)] = min(abs(m_pw(iw,v_iwrmpp(iw):end) - v_pwdel(iw)));
-%     v_Wrdel(iw)      = v_Wr(v_iwrmpp(iw)+v_iwrdel(iw)); % gives the corresponding wr
-%     
-%     i_pwdel_lower  = find(m_pw(iw,v_iwrmpp(iw):end) <= v_pwdel(iw),1,'last');
-%     i_pwdel_higher = find(m_pw(iw,v_iwrmpp(iw):end) >= v_pwdel(iw),1,'first');
-%     
-%     lower_than_b  = data(i_lower);
-%     higher_than_b = data(i_higher);
-% 
-% end
-
-% Wr0 = m_pw(vw0, wr0)
 
 % we add a few "deloaded" points so that, when the wind speed becomes higher
 % than the maximum specified one, the maximum power has been reached
@@ -134,11 +108,6 @@ for i_extra_vw = 1:5
     v_pwdel(nvw+i_extra_vw) = v_pwdel(nvw);
     v_Wrdel(nvw+i_extra_vw) = v_Wrdel(nvw) + i_extra_vw * (v_Wr(length(v_Wr))-v_Wrdel(nvw))/5;
 end
-
-% for i_extra_vw = 1:5
-%     v_pwmpp(nvw+i_extra_vw) = v_pwmpp(nvw);
-%     v_Wrmppp(nvw+i_extra_vw) = v_Wrmpp(nvw) + i_extra_vw * (v_Wr(length(v_Wr))-v_Wrmpp(nvw))/5;
-% end
 
 ipwmppn = find(v_pwmpp<=1,1,'last'); % nominal power (1 pu)
 Wrn = v_Wr(v_iwrmpp(ipwmppn)); % nominal speed
@@ -163,7 +132,6 @@ plot(wr0,pinitwindgen,'*', 'linewidth',4,'HandleVisibility','off');hold on;
 plot(v_wr,m_pw',':b', 'HandleVisibility','off');hold on;
 xlabel('Rotor speed (pu)')
 ylabel('Mechanical power (pu)')
-% legend(['', '','','','','','','','','','','','','','','','','','','','','','','', 'MPP', 'Deloaded'])
 hold off;
 sgt = sgtitle('Power-speed curve', 'interpreter','latex');
 sgt.FontSize = 18;

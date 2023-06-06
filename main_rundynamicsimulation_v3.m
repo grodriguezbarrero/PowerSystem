@@ -1,34 +1,28 @@
 % function main_rundynamicsimulation_v3
 
-% This version aims to provide fewer graphs but more quickly.
-
 % -------------------------------------------------------------------------
 % Predefined values
 % -------------------------------------------------------------------------
-% close all;
 tic
 
 powersystemdl = 'Powersystem.slx';
 
 load_system('Powersystem');
 
-str_uftype = 'uf';
-str_rocoftype = 'rocof';
+str_uftype      = 'uf';
+str_rocoftype   = 'rocof';
 
-fbase = 50;
-tsimulation = 35;
-t0 = 5;
+fbase           = 50;
+tsimulation     = 25;
+t0              = 3;
 
 v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
 
-% initialise WG model
-%     vw_ini        = 10;
-% t_wind_change = 20;
-%     vw_after      = 8;
-%     [pinitwindgen,wr0, ~, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(vw_ini);
+numWG           = 9;
 
-numWG         = 9;
-
+% Choose here the number of scenarios to run (from scenario 1 to 'nscenarios')
+nscenarios      = 24;
+    
 % -------------------------------------------------------------------------
 % Read input data
 % -------------------------------------------------------------------------
@@ -58,7 +52,8 @@ for igen = 1:ngen
 end
 
 % Read Nominal Power of WG
-Pn = m_gendata(4,ngen+1);
+Pn          = m_gendata(5,ngen+1);
+diameter    = m_gendata(11,ngen+1);
 
 % read ufls parameters
 [m_uflsparam,c_uflsID] = xlsread(xlsfilename,c_sheets{4}); 
@@ -89,38 +84,18 @@ ness = length(m_essdata(1,:));
 
 disp('Simulation start...');
 
-nscenarios      = 24;
-m_genscenarios  = m_genscenarios(1:nscenarios,:); % REMOVE THIS TO GET ALL SCENARIOS
+m_genscenarios  = m_genscenarios(1:nscenarios,:);
 v_pwg           = v_pwg(1:nscenarios);
-
-% preallocate output cells
-nsimulations = length(nonzeros(m_genscenarios));
-%     c_t                 = cell(nsimulations,1);
-%     c_w                 = cell(nsimulations,1);
-%     c_pgentot           = cell(nsimulations,1);
-%     c_pufls             = cell(nsimulations,1);
-%     c_pgenWGtot         = cell(nsimulations,1);
-isim = nsimulations;
-
-% preallocate output cells, but for the simulations where different WGs are
-% connected
-nsimulations_wg = 4 * nsimulations; % four WG combinations for every generator shut off
-%     c_t_wg              = cell(nsimulations_wg,1);
-%     c_w_wg              = cell(nsimulations_wg,1);
-%     c_pgentot_wg        = cell(nsimulations_wg,1);
-%     c_pufls_wg          = cell(nsimulations_wg,1);
-%     c_pgenWGtot_wg      = cell(nsimulations_wg,1);
-%     c_WGpenetration_wg  = cell(nsimulations_wg,1);
 
 delta_vw        = [0, 0.5, 1];
 t_delta_vw      = [t0-2, t0, t0+2];
 
-nWGgroupsonline = 3; % 3, 6 or 9 WGs
-ndelta_vw       = length(delta_vw); % 0, 0.5, 1 or 2 m/s
-nt_delta_vw     = length(t_delta_vw); % 2s before, 0s, 2s after disconnection
-ngenonline      = 8;
+nWGgroupsonline = 3; % 1,2 or 3 groups, equivalent to 3, 6 or 9 WGs
+ndelta_vw       = length(delta_vw); % 0, 0.5, 1 m/s
+nt_delta_vw     = length(t_delta_vw); % 2s before, 0s, 2s after CG loss
+ngenonline      = 8; % there is at most 8 CGs per scenario
 
-
+% preallocate output cells (save computation time)
 c_t_wg              = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
 c_w_wg              = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
 c_pgentot_wg        = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
@@ -131,8 +106,6 @@ c_WGpenetration_wg  = cell(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, n
 m_fmin  = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
 m_fss   = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
 m_pufls = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw);
-
-isim_wg = nsimulations_wg;
 
 ngenscenarios = size(m_genscenarios,1);
 
@@ -146,9 +119,6 @@ set_param([powersystemdl(1:end-4) '/Perturbation'],'time',['[' sprintf('%f',t0) 
 
 set_param(powersystemdl(1:end-4),'StopTime',sprintf('%f',tsimulation));
 
-
-%-----------------------new-code-------------------------
-
 % simulate each scenario
 for igenscenario = ngenscenarios:-1:1
     
@@ -157,7 +127,7 @@ for igenscenario = ngenscenarios:-1:1
     pinitwindgen = v_pwg(igenscenario); % in MW
 
     % initialise the WGs for each scenario
-    [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(powersystemdl(1:end-4), pinitwindgen); % in pu
+    [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup_v3(powersystemdl(1:end-4), pinitwindgen, Pn, diameter); % in pu
 
     for i = 0:numWG-1
         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
@@ -200,15 +170,12 @@ for igenscenario = ngenscenarios:-1:1
             % set UFLS parameters (step size only)
             set_param([powersystemdl(1:end-4) '/UFLS'],'v_pshed0pu',['[' sprintf('%f ',v_pshed0pu) ']']);
 
-
             % set the right number of WGs
             set_param([powersystemdl(1:end-4) '/numWG'],'Value',['[' sprintf('%f',WGgroupsonline) ']']); % CHANGE
-            
             
             i_delta_vw = 1;
 
             for delta_vw = [0, 0.5, 1]
-                
                 
                 % initialise the change in wind speed
                 set_param([powersystemdl(1:end-4) '/Wind'],'After',['[' sprintf('%f',vw0-delta_vw) ']']);
@@ -259,19 +226,18 @@ disp('Simulation stops.');
 % close_system(powersystemdl,0);
 
 %% ------------------------------------------------------------------------
-% Display frequency variations for different scenarios
+% Display frequency deviation (among other things) for different parameters
 % -------------------------------------------------------------------------
 
-%     close all;
 v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#0076A8" "#0072BD" "#D95319"];
 
-% Choose scenario here
-igenscenario    = 24; % 1, 2, ... 24
-igenonline      = 4; % bus number being disconnected
-WGgroupsonline  = 3; % 1, 2, 3 WGs
-i_delta_vw      = 3; % 0, 0.5, 1 m/s
-i_t_delta_vw    = 2; % 2s before, 0s, 2s after
-
+% ===> Choose parameters to print out their simulation here
+igenscenario    = 1; % scenario 1, 2, ... 24
+igenonline      = 1; % bus number being disconnected
+WGgroupsonline  = 1; % 1, 2, 3 WGs groups (so 3, 6, 9 WGs)
+i_delta_vw      = 2; % 0, 0.5, 1 m/s
+i_t_delta_vw    = 1; % 2s before, 0s, 2s after
+nscenarios      = 1; % 1, 2, ... 24
 
 fun_graphWGs(igenscenario, igenonline, i_delta_vw, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
 
@@ -280,5 +246,7 @@ fun_graphWindTiming(igenscenario, igenonline, WGgroupsonline, i_delta_vw, c_t_wg
 fun_graphWindSpeed(igenscenario, igenonline, WGgroupsonline, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
 
 fun_graphGeneratorLoss(igenscenario, WGgroupsonline, i_t_delta_vw, i_delta_vw, m_genscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
+
+fun_graphScenarios(igenonline, WGgroupsonline, i_t_delta_vw, i_delta_vw, 4, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
 
 toc
