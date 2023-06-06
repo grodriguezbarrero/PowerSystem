@@ -233,12 +233,13 @@ v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#007
 
 % ===> Choose parameters to print out their simulation here
 igenscenario    = 1; % scenario 1, 2, ... 24
-igenonline      = 1; % bus number being disconnected
-WGgroupsonline  = 1; % 1, 2, 3 WGs groups (so 3, 6, 9 WGs)
-i_delta_vw      = 2; % 0, 0.5, 1 m/s
-i_t_delta_vw    = 1; % 2s before, 0s, 2s after
+igenonline      = 5; % bus number being disconnected
+WGgroupsonline  = 3; % 1, 2, 3 WGs groups (so 3, 6, 9 WGs)
+i_delta_vw      = 1; % 0, 0.5, 1 m/s
+i_t_delta_vw    = 2; % 2s before, 0s, 2s after
 nscenarios      = 1; % 1, 2, ... 24
 
+%%
 fun_graphWGs(igenscenario, igenonline, i_delta_vw, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
 
 fun_graphWindTiming(igenscenario, igenonline, WGgroupsonline, i_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
@@ -247,6 +248,6 @@ fun_graphWindSpeed(igenscenario, igenonline, WGgroupsonline, i_t_delta_vw, c_t_w
 
 fun_graphGeneratorLoss(igenscenario, WGgroupsonline, i_t_delta_vw, i_delta_vw, m_genscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
 
-fun_graphScenarios(igenonline, WGgroupsonline, i_t_delta_vw, i_delta_vw, 4, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
+fun_graphScenarios(igenonline, WGgroupsonline, i_t_delta_vw, i_delta_vw, 4, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
 toc
