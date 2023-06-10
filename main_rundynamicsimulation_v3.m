@@ -240,14 +240,15 @@ i_t_delta_vw    = 2; % 2s before, 0s, 2s after
 nscenarios      = 1; % 1, 2, ... 24
 
 %%
-fun_graphWGs(igenscenario, igenonline, i_delta_vw, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
 
-fun_graphWindTiming(igenscenario, igenonline, WGgroupsonline, i_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
+fun_graphScenarios(igenonline, WGgroupsonline, i_t_delta_vw, i_delta_vw, 4, nscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
-fun_graphWindSpeed(igenscenario, igenonline, WGgroupsonline, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
+fun_graphGeneratorLoss(igenscenario, WGgroupsonline, i_t_delta_vw, i_delta_vw, m_genscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
-fun_graphGeneratorLoss(igenscenario, WGgroupsonline, i_t_delta_vw, i_delta_vw, m_genscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
+fun_graphWGs(igenscenario, igenonline, i_delta_vw, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
-fun_graphScenarios(igenonline, WGgroupsonline, i_t_delta_vw, i_delta_vw, 4, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
+fun_graphWindSpeed(igenscenario, igenonline, WGgroupsonline, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
+
+fun_graphWindTiming(igenscenario, igenonline, WGgroupsonline, i_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
 toc

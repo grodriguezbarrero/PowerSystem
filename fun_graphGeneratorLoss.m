@@ -1,4 +1,6 @@
-function fun_graphGeneratorLoss(igenscenario, WGgroupsonline, i_t_delta_vw, i_delta_vw, m_genscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours)
+function fun_graphGeneratorLoss(igenscenario, WGgroupsonline, i_t_delta_vw, i_delta_vw, ...
+    m_genscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, ...
+    v_colours, m_fss, m_fmin, m_pufls)
 
 % This function shows several signals (including the frequency) with
 % different Gens shutting off
@@ -64,3 +66,32 @@ hold off;
 sgt = sgtitle(['Scenario ', num2str(igenscenario)],'Color',"#0072BD", 'interpreter','latex');
 sgt.FontSize = 18;
 
+%% LaTeX table
+
+% Initialize LaTeX table
+latexTable = sprintf('\\begin{table}[ht]\n');
+latexTable = [latexTable, sprintf('    \\centering\n')];
+latexTable = [latexTable, sprintf('    \\caption{Indices.}\n')];
+latexTable = [latexTable, sprintf('    \\begin{tabular}{cccc}\n')];
+latexTable = [latexTable, sprintf('    \\\\')];
+
+% Add table header
+latexTable = [latexTable, sprintf('    %s & %s & %s & %s \\\\\n', 'Lost CG', '$f_{ss} (Hz)$', '$f_{min} (Hz)$', '$P_{ufls} (MW)$')];
+latexTable = [latexTable, sprintf('    \\hline\n')];
+
+% Add table content
+for igenonline = 1:ngenonline
+    latexTable = [latexTable, sprintf('    %d & %.4f & %.4f & %.4f \\\\\n', igenonline, ...
+        m_fss(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw), ...
+        m_fmin(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw), ...
+        m_pufls(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw))];
+end
+
+% Finalize LaTeX table
+latexTable = [latexTable, sprintf('    \\hline\n')];
+latexTable = [latexTable, sprintf('    \\end{tabular}\n')];
+latexTable = [latexTable, sprintf('    \\label{tb:results}\n')];
+latexTable = [latexTable, sprintf('\\end{table}')];
+
+% Print the LaTeX table
+disp(latexTable);

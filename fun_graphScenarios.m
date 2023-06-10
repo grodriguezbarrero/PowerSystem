@@ -64,13 +64,11 @@ hold off;
 sgt = sgtitle(['Loss of generator ', num2str(igenonline)],'Color',"#0072BD", 'interpreter','latex');
 sgt.FontSize = 18;
 
-%%
-
-% Define column names
-columnNames = {'Scenario', '$f_{ss}$', '$f_{min}$', '$p_{ufls}$'};
+%% LaTeX table
 
 % Initialize LaTeX table
 latexTable = sprintf('\\begin{table}[ht]\n');
+latexTable = [latexTable, sprintf('\\')];
 latexTable = [latexTable, sprintf('\\centering\n')];
 latexTable = [latexTable, sprintf('\\caption{Table.}\n')];
 latexTable = [latexTable, sprintf('\\\\n')];
