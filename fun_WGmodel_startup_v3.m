@@ -1,27 +1,19 @@
 function [vw0, wr0, pinitwindgen, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
     v_wrmpp,v_pwdel,v_wrdel] = fun_WGmodel_startup_v3(powersystemdl, pinitwindgenMW, Pn, diameter)
 
-
-% function [pinitwindgen, wr0, Tc1, Tc2, Hw, R, v_vw, m_pw, v_wr, v_pwmpp, ...
-%    v_wrmpp,v_pwdel,v_wrdel] = fun_WGmodel_startup_v3(vw)
-
-% UPDATE: this model does not deal with beta
 % This function sets up the parameters of the WG and inserts them into the
 % Powersystem Simulink model.
 
-% powersystemdl = 'Powersystem';
 load_system(powersystemdl);
-
 
 %% Setting up parameters
 
-% startup wind speed
-Tc1 = 0.05;
-Tc2 = 0.05;
+Tc1 = 0.05; % time constant
+Tc2 = 0.05; % time constant
 Hw  = 5;    % inertia, in its own base
 R   = 0.05; % droop
 
-numWG = 9;
+numWG = 9;  % number of total generators
 
 %% Setting up the LUTs and the initial equilibrium point
 v_vw    = 5:.5:12;

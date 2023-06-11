@@ -1,10 +1,7 @@
 function fun_setsimulinkblockparameters(powersystemdl,ngen,m_gendata,ness, ...
     m_essdata,v_genscenario,v_igenonline,igenonline,v_iremgenonline, Pn) % v_pshed0MW
 
-% fun_prepareuflsformat4simulinkformat
 % Prepares and sets the parameters of the blocks of the Simulink model.
-%
-% Parameters are all in pu on system power and frequency basis
 
 v_pinit = v_genscenario(v_iremgenonline); % the initial power for the 
 
@@ -12,14 +9,12 @@ v_pinit = v_genscenario(v_iremgenonline); % the initial power for the
 v_Mbase = m_gendata(4,v_iremgenonline);
 Sbase = sum(v_Mbase);
 
-% ----
 % calculate the total generated power by CG
 pgenCGtot = 0;
 for i=1:ngen+1 % iterate through ALL generators
     pgenCGtot = pgenCGtot + v_genscenario(v_igenonline(i));  % sum the power (in MW) of the all the CGs in the scenario
 end
 pgenCGtot = pgenCGtot/Sbase; % to make it in pu
-% ----
 
 % lost amount of power
 plostpu = v_genscenario(v_igenonline(igenonline))/Sbase;
