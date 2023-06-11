@@ -16,7 +16,7 @@ fbase           = 50;
 tsimulation     = 25;
 t0              = 3;
 
-v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
+% v_essemptydefault = [1000, 80]; % if no ess, use these values for a1, a2, dfracemax
 
 numWG           = 9;
 
@@ -154,7 +154,7 @@ for igenscenario = ngenscenarios:-1:1
         ngen = length(v_iremgenonline);
 
         % set model parameters
-        fun_setsimulinkblockparameters(powersystemdl(1:end-4),ngen,m_gendata,ness,m_essdata, ...
+        fun_setsimulinkblockparameters(powersystemdl(1:end-4),ngen,m_gendata, ...
             v_genscenario,v_igenonline,igenonline,v_iremgenonline, Pn); %v_pshed0MW
         
         for WGgroupsonline = 1:3
@@ -233,10 +233,10 @@ v_colours   = ["#EDB120" "#7E2F8E" "#77AC30" "#4DBEEE" "#A2142F" "#AE43F0" "#007
 
 % ===> Choose parameters to print out their simulation here
 igenscenario    = 1; % scenario 1, 2, ... 24
-igenonline      = 5; % bus number being disconnected
-WGgroupsonline  = 3; % 1, 2, 3 WGs groups (so 3, 6, 9 WGs)
+igenonline      = 1; % bus number being disconnected
+WGgroupsonline  = 1; % 1, 2, 3 WGs groups (so 3, 6, 9 WGs)
 i_delta_vw      = 1; % 0, 0.5, 1 m/s
-i_t_delta_vw    = 2; % 2s before, 0s, 2s after
+i_t_delta_vw    = 1; % 2s before, 0s, 2s after
 nscenarios      = 1; % 1, 2, ... 24
 
 %%

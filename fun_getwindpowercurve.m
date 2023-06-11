@@ -1,4 +1,4 @@
-function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve_v5(v_beta,v_vw, pinitwindgenMW, Pn, diameter)
+function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve(v_beta,v_vw, pinitwindgenMW, Pn, diameter)
 
 % Debugging:
 % v_beta = 0;
