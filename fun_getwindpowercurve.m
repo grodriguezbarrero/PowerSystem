@@ -1,43 +1,22 @@
 function [m_pw,v_wr,v_pwmpp,v_wrmpp,v_pwdel,v_wrdel, vw0, wr0, pinitwindgen] = fun_getwindpowercurve(v_beta,v_vw, pinitwindgenMW, Pn, diameter)
 
-% Debugging:
-% v_beta = 0;
-% v_vw = 5:0.5:12;
-% pinitwindgenMW = .829;
-% pinitwindgenMW = .67;
-
-% This newer version initialises a bunch of the variables used to zero.
-% Requires: wind speeds, initial wind speed, initial power
-% Provides: curve, equilibrium
-
-% This function computes the power-speed curves for wind generation.
+% This function computes the power-speed curves (MPP and deloaded operation
+% modes) for wind generation.
 % The power-speed curve of a wind generator is used for this
 % purpose. The resulting curve must be appropriately scaled.
 %
-% Input:    angle of attack (beta), wind speed (vw), initial P (pinitwindgen), nominal P (Pn), rotor diameter 
+% Input:    angle of attack (beta), wind speed (v_vw), initial Power
+%           (pinitwindgen), nominal P (Pn), rotor diameter 
 % Output:   wind power, pw; rotor speed, wr; MPP power, pwmpp; MPP rotor
 %           speed, wrmpp; deloaded power, pwdel; deloaded rotor speed,
 %           wrdel
 
-deload = 0.1; % percentage of deloading
-rho = 1.275; % air density
+deload = 0.1;   % percentage of deloading
+rho = 1.275;    % air density
 
-% 7 MW wind generator data
-% Rb = 172/2;
-% Pn = 7e6;
-% v_Wr = 0:0.01:2;
-
-% 1.5 MW wind generator data
-% Rb = 31.2; % blade radius (m)
-% Pn = 2.5e6; % nominal power (MW)
-% v_Wr = 0:0.01:5; % rotor speed range (rad/s)
-
-% 2.5 MW wind generator data
-% Pn = 2.5e6; % nominal power (MW)
-% diameter = 84; % diameter (m)
 v_Wr = 0:0.01:3.4; % rotor speed range (rad/s)
 
-Pn = Pn * 1e6;      % 
+Pn = Pn * 1e6;
 Rb = diameter/2; % blade radius (m)
 
 v_cp = [0.73, 151, 0.58, 0.002, 2.14, 13.2, 18.4, -0.02, -0.003]; % performance coefficients
@@ -70,11 +49,6 @@ end
 [v_pwmpp,v_iwrmpp] = max(m_pw,[],2); % MPP
 v_pwdel = (1-deload) * v_pwmpp; % deloaded
 
-% ==> Algorithm to obtain deloaded speed and power:
-% Look up for the "0.9*max(m_pw,[],2)" value (in other words, pw_del) and
-% see its corresponding i. Then we look for the corresponding wr value with
-% that i.
-
 v_iwrdel= zeros(1,nvw);
 v_wrdel = zeros(1,nvw+5);
 v_Wrdel = zeros(1,nvw+5);
@@ -83,7 +57,7 @@ v_Wrdel = zeros(1,nvw+5);
 i_pinitwindgen_lower  = find(v_pwdel <= pinitwindgen,1,'last');
 i_pinitwindgen_higher = find(v_pwdel >= pinitwindgen,1,'first');
 
-% interpolate
+% interpolate to find initial wind speed
 vw0 = v_vw(i_pinitwindgen_lower) + ...
     (v_vw(i_pinitwindgen_higher)-v_vw(i_pinitwindgen_lower))*(pinitwindgen-v_pwdel(i_pinitwindgen_lower))/(v_pwdel(i_pinitwindgen_higher)-v_pwdel(i_pinitwindgen_lower));
 
@@ -95,6 +69,7 @@ for iw = nvw:-1:1
     v_Wrdel(iw)      = v_Wr(v_iwrmpp(iw)+v_iwrdel(iw)); % gives the corresponding wr
 end
 
+% find closest rotor speed value that corresponds to Wr0
 Wr0_lower   = v_Wrdel(i_pinitwindgen_lower);
 Wr0_higher  = v_Wrdel(i_pinitwindgen_higher);
 
@@ -109,16 +84,15 @@ for i_extra_vw = 1:5
     v_Wrdel(nvw+i_extra_vw) = v_Wrdel(nvw) + i_extra_vw * (v_Wr(length(v_Wr))-v_Wrdel(nvw))/5;
 end
 
-ipwmppn = find(v_pwmpp<=1,1,'last'); % nominal power (1 pu)
-Wrn = v_Wr(v_iwrmpp(ipwmppn)); % nominal speed
+ipwmppn = find(v_pwmpp<=1,1,'last');    % nominal power (1 pu)
+Wrn = v_Wr(v_iwrmpp(ipwmppn));          % nominal speed
 v_wr = v_Wr/Wrn;
-%v_wr = v_Wr;
 
 v_Wrmpp = v_Wr(v_iwrmpp);
-v_wrmpp = v_Wrmpp/Wrn; % speed corresponding to MPP
-v_wrdel = v_Wrdel/Wrn; % speed corresponding to deloaded operation points
+v_wrmpp = v_Wrmpp/Wrn;  % speed corresponding to MPP
+v_wrdel = v_Wrdel/Wrn;  % speed corresponding to deloaded operation points
 
-wr0     = Wr0/Wrn;
+wr0     = Wr0/Wrn;      % turning to pu
 
 %% TO DRAW FIGURE WR-PW CURVE:
 figure;
