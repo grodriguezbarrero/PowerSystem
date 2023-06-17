@@ -27,7 +27,8 @@ for igenscenario = 1:nscenarios
         c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         'Color',v_colours(igenscenario));hold on;
 end
-ylabel('P_{shedded}^{UFLS} (MW)')
+ylabel('P_{shed}^{UFLS} (MW)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 3);
@@ -38,6 +39,7 @@ for igenscenario = 1:nscenarios
         'Color',v_colours(igenscenario));hold on;
 end
 ylabel('WG pen. (%)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 4);
@@ -48,6 +50,7 @@ for igenscenario = 1:nscenarios
         'Color',v_colours(igenscenario));hold on;
 end
 ylabel('P_{gen}^{WG} (MW)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 5);
@@ -59,6 +62,7 @@ for igenscenario = 1:nscenarios
 end
 xlabel('Time (s)')
 ylabel('P_{gen}^{tot} (MW)')
+ylim('padded')
 hold off;
 
 sgt = sgtitle(['Loss of generator ', num2str(igenonline)],'Color',"#0072BD", 'interpreter','latex');

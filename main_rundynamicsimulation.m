@@ -49,6 +49,8 @@ end
 % Read Nominal Power of WG
 Pn          = m_gendata(5,ngen+1);
 diameter    = m_gendata(11,ngen+1);
+R           = 1/m_gendata(2,ngen+1);
+Hw          = m_gendata(3,ngen+1);
 
 % read ufls parameters
 [m_uflsparam,c_uflsID] = xlsread(xlsfilename,c_sheets{4}); 
@@ -95,7 +97,7 @@ m_pufls = zeros(nscenarios, ngenonline, nWGgroupsonline, ndelta_vw, nt_delta_vw)
 
 ngenscenarios = size(m_genscenarios,1);
 
-% set fix simulation block paramters
+% set fixed simulation block paramters
 set_param([powersystemdl(1:end-4) '/UFLS'],'v_dfufpu',['[' sprintf('%f ',v_dfufpu) ']'],...
     'v_tintuf',['[' sprintf('%f ',v_tintuf) ']'],'v_topnuf',['[' sprintf('%f ',v_topnuf) ']'],... 
     'v_dfrocofpu',['[' sprintf('%f ',v_dfrocofpu) ']'],'v_dfdtrocofpu',['[' sprintf('%f ',v_dfdtrocofpu) ']'],...
@@ -105,15 +107,20 @@ set_param([powersystemdl(1:end-4) '/Perturbation'],'time',['[' sprintf('%f',t0) 
 
 set_param(powersystemdl(1:end-4),'StopTime',sprintf('%f',tsimulation));
 
+% set fixed WG parameters
+for i = 0:numWG-1
+    set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'R',sprintf('%f',R),'Hw',sprintf('%f',Hw));
+end
+
 % simulate each scenario
 for igenscenario = ngenscenarios:-1:1
     
     fprintf('Scenario: %i', igenscenario);
     
     pinitwindgen = v_pwg(igenscenario); % in MW
-
+    
     % initialise the WGs for each scenario
-    [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup(powersystemdl(1:end-4), pinitwindgen, Pn, diameter); % in pu
+    [vw0, wr0, pinitwindgen, ~, ~, ~, ~, ~, ~,~,~] = fun_WGmodel_startup(powersystemdl(1:end-4), pinitwindgen, Pn, diameter); % in pu
 
     for i = 0:numWG-1
         set_param([powersystemdl(1:end-4) '/WindGenerator' int2str(i)],'pinitwindgen',sprintf('%f',pinitwindgen),'wr0',sprintf('%f',wr0));
@@ -170,7 +177,7 @@ for igenscenario = ngenscenarios:-1:1
                 for t_delta_vw = [t0-2, t0, t0+2]
                     
                     % initialise the time of the wind speed change
-                    set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t_delta_vw) ']']);
+                    set_param([powersystemdl(1:end-4) '/Wind'],'time',['[' sprintf('%f',t0+t_delta_vw) ']']);
                     
                     % simulate it and store results
                     [c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw},~, ...
@@ -197,6 +204,7 @@ for igenscenario = ngenscenarios:-1:1
                         min(c_w_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw});
                     m_pufls(igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw)    = ...
                         c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}(end);
+                    
 
                     i_t_delta_vw = i_t_delta_vw + 1;
                 end
@@ -224,7 +232,7 @@ i_delta_vw      = 1; % 0, 0.5, 1 m/s
 i_t_delta_vw    = 1; % 2s before, 0s, 2s after
 nscenarios      = 1; % 1, 2, ... 24
 
-%%
+%% 
 
 fun_graphScenarios(igenonline, WGgroupsonline, i_t_delta_vw, i_delta_vw, nscenarios, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
@@ -235,5 +243,11 @@ fun_graphWGs(igenscenario, igenonline, i_delta_vw, i_t_delta_vw, c_t_wg, c_w_wg,
 fun_graphWindSpeed(igenscenario, igenonline, WGgroupsonline, i_t_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
 
 fun_graphWindTiming(igenscenario, igenonline, WGgroupsonline, i_delta_vw, c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, v_colours, m_fss, m_fmin, m_pufls)
+
+[v_sum_pufls_delta_vw, v_sum_delta_fmin_delta_vw, v_sum_pufls_t_delta_vw, v_sum_delta_fmin_t_delta_vw] = ...
+    fun_sums(m_pufls, m_fmin, fbase, ngenscenarios, m_genscenarios, t0);
+
+fun_sim_no_droop(powersystemdl, igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw, ...
+   c_t_wg, c_w_wg, c_pufls_wg, c_WGpenetration_wg, c_pgenWGtot_wg, c_pgentot_wg, t0, numWG, m_genscenarios, m_gendata, v_pshed0, v_pwg, Pn, diameter, fbase);
 
 toc

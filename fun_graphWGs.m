@@ -14,6 +14,7 @@ for WGgroupsonline = 1:3
 end
 legend('3 WGs', '6 WGs', '9 WGs');
 ylabel('Freq \omega (Hz)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 2);
@@ -23,7 +24,8 @@ for WGgroupsonline = 1:3
         c_pufls_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw}, ...
         'Color',v_colours(WGgroupsonline));hold on;
 end
-ylabel('P_{shedded}^{UFLS} (MW)')
+ylabel('P_{shed}^{UFLS} (MW)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 3);
@@ -34,6 +36,7 @@ for WGgroupsonline = 1:3
         'Color',v_colours(WGgroupsonline));hold on;
 end
 ylabel('WG pen. (%)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 4);
@@ -44,6 +47,7 @@ for WGgroupsonline = 1:3
         'Color',v_colours(WGgroupsonline));hold on;
 end
 ylabel('P_{gen}^{WG} (MW)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 5);
@@ -55,6 +59,7 @@ for WGgroupsonline = 1:3
 end
 xlabel('Time (s)')
 ylabel('P_{gen}^{tot} (MW)')
+ylim('padded')
 hold off;
 
 sgt = sgtitle(['Scenario ', num2str(igenscenario), ' with the number ', num2str(igenonline), ' Bus shut off'],'Color',"#0072BD", 'interpreter','latex');
