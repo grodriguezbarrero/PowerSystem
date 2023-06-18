@@ -120,6 +120,7 @@ plot(c_t_nodroop, c_w_nodroop,'Color',"#7E2F8E");hold on;
 
 legend('Droop', 'No droop');
 ylabel('Freq \omega (Hz)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 2);
@@ -129,6 +130,7 @@ plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw},
     'Color',"#EDB120");hold on;
 plot(c_t_nodroop, c_pufls_nodroop,'Color',"#7E2F8E");hold on;
 ylabel('P_{shed}^{UFLS} (MW)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 3);
@@ -138,6 +140,7 @@ plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw},
     'Color',"#EDB120");hold on;
 plot(c_t_nodroop, c_WGpenetration_nodroop,'Color',"#7E2F8E");hold on;
 ylabel('WG pen. (%)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 4);
@@ -147,6 +150,7 @@ plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw},
     'Color',"#EDB120");hold on;
 plot(c_t_nodroop, c_pgenWGtot_nodroop,'Color',"#7E2F8E");hold on;
 ylabel('P_{gen}^{WG} (MW)')
+ylim('padded')
 hold off;
 
 subplot(5, 1, 5);
@@ -157,6 +161,7 @@ plot(c_t_wg{igenscenario, igenonline, WGgroupsonline, i_delta_vw, i_t_delta_vw},
 plot(c_t_nodroop, c_pgentot_nodroop,'Color',"#7E2F8E");hold on;
 xlabel('Time (s)')
 ylabel('P_{gen}^{tot} (MW)')
+ylim('padded')
 hold off;
 
 sgt = sgtitle(['Scenario ', num2str(igenscenario), ' with the number ', num2str(igenonline), ' Bus shut off'],'Color',"#0072BD", 'interpreter','latex');
